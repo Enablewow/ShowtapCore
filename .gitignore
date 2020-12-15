@@ -1,0 +1,7 @@
+./STCoreLibrary/build/
+./STCoreLibrary.xcodeproj
+./STCoreLibrary/cmake-build-android
+./STCoreLibrary/Testing
+./STCoreLibrary/CMakeLists.txt
+./STCoreLibrary/main.cpp
+./STCoreLibrary/parser/

@@ -1,0 +1,9 @@
+/Users/lavalse/STCoreLibrary/STCoreLibrary/cmake-build-android/CMakeFiles/rebuild_cache.dir
+/Users/lavalse/STCoreLibrary/STCoreLibrary/cmake-build-android/CMakeFiles/edit_cache.dir
+/Users/lavalse/STCoreLibrary/STCoreLibrary/cmake-build-android/CMakeFiles/showtap.dir
+/Users/lavalse/STCoreLibrary/STCoreLibrary/cmake-build-android/parser/CMakeFiles/rebuild_cache.dir
+/Users/lavalse/STCoreLibrary/STCoreLibrary/cmake-build-android/parser/CMakeFiles/edit_cache.dir
+/Users/lavalse/STCoreLibrary/STCoreLibrary/cmake-build-android/parser/CMakeFiles/input_parser.dir
+/Users/lavalse/STCoreLibrary/STCoreLibrary/cmake-build-android/reader/CMakeFiles/rebuild_cache.dir
+/Users/lavalse/STCoreLibrary/STCoreLibrary/cmake-build-android/reader/CMakeFiles/edit_cache.dir
+/Users/lavalse/STCoreLibrary/STCoreLibrary/cmake-build-android/reader/CMakeFiles/stap_reader.dir

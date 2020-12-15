@@ -1,0 +1,6 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -G "CodeBlocks - Unix Makefiles" /Users/lavalse/STCoreLibrary/STCoreLibrary
+Import Library: input_parser
+Import Library: stap_reader
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/lavalse/STCoreLibrary/STCoreLibrary/cmake-build-android

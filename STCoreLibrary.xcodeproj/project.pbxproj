@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		CA3EC336255D023800E24BFC /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA3EC335255D023800E24BFC /* main.cpp */; };
+		CA3EC352255D1D4100E24BFC /* input_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA3EC350255D1D4100E24BFC /* input_parser.cpp */; };
+		CA3EC357255D2CF300E24BFC /* showtap_file_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA3EC355255D2CF300E24BFC /* showtap_file_reader.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,15 @@
 /* Begin PBXFileReference section */
 		CA3EC332255D023800E24BFC /* STCoreLibrary */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = STCoreLibrary; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA3EC335255D023800E24BFC /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		CA3EC33E255D070500E24BFC /* constants.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = constants.hpp; sourceTree = "<group>"; };
+		CA3EC350255D1D4100E24BFC /* input_parser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = input_parser.cpp; sourceTree = "<group>"; };
+		CA3EC351255D1D4100E24BFC /* input_parser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = input_parser.hpp; sourceTree = "<group>"; };
+		CA3EC355255D2CF300E24BFC /* showtap_file_reader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = showtap_file_reader.cpp; sourceTree = "<group>"; };
+		CA3EC356255D2CF300E24BFC /* showtap_file_reader.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = showtap_file_reader.hpp; sourceTree = "<group>"; };
+		CA3EC35B255D2FC000E24BFC /* errors.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = errors.hpp; sourceTree = "<group>"; };
+		CA3EC35F255D36F400E24BFC /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		CA75DB42255E886000B2B1DE /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		CA75DB43255E887600B2B1DE /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +49,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CA1276A425638D7500F1F896 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				CA3EC351255D1D4100E24BFC /* input_parser.hpp */,
+				CA3EC356255D2CF300E24BFC /* showtap_file_reader.hpp */,
+				CA3EC33E255D070500E24BFC /* constants.hpp */,
+				CA3EC35B255D2FC000E24BFC /* errors.hpp */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
 		CA3EC329255D023800E24BFC = {
 			isa = PBXGroup;
 			children = (
@@ -57,9 +79,31 @@
 		CA3EC334255D023800E24BFC /* STCoreLibrary */ = {
 			isa = PBXGroup;
 			children = (
+				CA1276A425638D7500F1F896 /* include */,
+				CA3EC354255D2CB400E24BFC /* reader */,
+				CA3EC34F255D1D2F00E24BFC /* parser */,
 				CA3EC335255D023800E24BFC /* main.cpp */,
+				CA3EC35F255D36F400E24BFC /* CMakeLists.txt */,
 			);
 			path = STCoreLibrary;
+			sourceTree = "<group>";
+		};
+		CA3EC34F255D1D2F00E24BFC /* parser */ = {
+			isa = PBXGroup;
+			children = (
+				CA3EC350255D1D4100E24BFC /* input_parser.cpp */,
+				CA75DB42255E886000B2B1DE /* CMakeLists.txt */,
+			);
+			path = parser;
+			sourceTree = "<group>";
+		};
+		CA3EC354255D2CB400E24BFC /* reader */ = {
+			isa = PBXGroup;
+			children = (
+				CA3EC355255D2CF300E24BFC /* showtap_file_reader.cpp */,
+				CA75DB43255E887600B2B1DE /* CMakeLists.txt */,
+			);
+			path = reader;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -119,6 +163,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA3EC336255D023800E24BFC /* main.cpp in Sources */,
+				CA3EC352255D1D4100E24BFC /* input_parser.cpp in Sources */,
+				CA3EC357255D2CF300E24BFC /* showtap_file_reader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,6 +222,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/boost_1_74_0/include/;
+				LIBRARY_SEARCH_PATHS = /usr/local/boost_1_74_0/lib/;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -229,6 +277,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/boost_1_74_0/include/;
+				LIBRARY_SEARCH_PATHS = /usr/local/boost_1_74_0/lib/;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;

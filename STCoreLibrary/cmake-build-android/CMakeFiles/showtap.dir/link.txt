@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libshowtap.a  parser/CMakeFiles/input_parser.dir/input_parser.cpp.o reader/CMakeFiles/stap_reader.dir/showtap_file_reader.cpp.o reader/CMakeFiles/stap_reader.dir/dto/showtap_object.cpp.o reader/CMakeFiles/stap_reader.dir/dto/thumbnail_info.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libshowtap.a
