@@ -31,6 +31,8 @@
 
 #define F_EXT_METADATA ".info"
 
+const char* root = nullptr;
+
 void log(const char *format, ...){
     va_list args;
     va_start(args, format);

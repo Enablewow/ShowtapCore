@@ -6,12 +6,11 @@
 #define SHOWTAP_CORE_LIBRARY_ABS_JSON_H
 
 #include <iostream>
+
 #include <rapidjson/writer.h>
 #include <rapidjson/fwd.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/document.h>
-
-#endif //SHOWTAP_CORE_LIBRARY_ABS_JSON_H
 
 class BaseJson {
     virtual bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const = 0;
@@ -26,3 +25,5 @@ public:
         return deserialize(d);
     }
 };
+
+#endif //SHOWTAP_CORE_LIBRARY_ABS_JSON_H

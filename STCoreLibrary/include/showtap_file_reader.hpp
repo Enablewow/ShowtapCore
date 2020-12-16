@@ -16,9 +16,11 @@
 
 #include <rapidjson/document.h>
 
+#include <extension/efile.h>
 #include <extension/estring.h>
 
 #include <dto/include/thumbnail_info.h>
+#include <dto/include/showtap_metadata.h>
 
 using namespace std;
 using namespace macaron;
@@ -29,8 +31,11 @@ using namespace rapidjson;
 class FileReader {
 private:
     ifstream stream;
+    int length = 0;
 
     string dest;
+
+    ShowtapMetadata metadata;
 
     void extractBinaryThumbnail();
     void extractBinaryResources();
@@ -39,16 +44,25 @@ private:
     string readString(long);
     string readString(long, bool);
 
+    bool isAvaliable(){
+        return stream.tellg() < length;
+    }
+
 public:
     FileReader(const string& path){
         const char *_path = path.c_str();
-        log("Received path [%s]", _path);
 
-        stream.open(_path, ios_base::binary);
-    }
+        string filename = getFilenameFromPath(path, true);
+        dest = getTemporaryStapDirectory(filename);
 
-    void setDestination(string dest){
-        this->dest = dest;
+        stream.open(_path, ios_base::in | ios_base::binary);
+
+        int f = stream.tellg();
+        stream.seekg(0, ios::end);
+        int e = stream.tellg();
+
+        length = e - f;
+        stream.seekg(0, ios::beg);
     }
     
     int extract();

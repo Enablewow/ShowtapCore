@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(_DTO
         dto/showtap_object.cpp
-        dto/thumbnail_info.cpp)
+        dto/thumbnail_info.cpp
+        dto/showtap_metadata.cpp)
 
 add_library(stap_reader SHARED
         showtap_file_reader.cpp

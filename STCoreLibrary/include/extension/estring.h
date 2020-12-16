@@ -8,12 +8,17 @@
 #include <iostream>
 #include <cstdio>
 #include <string>
+#include <sstream>
+#include <vector>
+#include <regex>
 
 #define IS_ALNUM(ch) \
             ( ch >= 'a' && ch <= 'z' ) || \
             ( ch >= 'A' && ch <= 'Z' ) || \
             ( ch >= '0' && ch <= '9' ) || \
             ( ch >= '-' && ch <= '.' )
+
+#define REGEX_EXTENSION std::regex("\\.[a-zA-Z0-4]+$")
 
 char* url_decode( const char* str ){
 
@@ -81,7 +86,7 @@ char* url_encode( const char* str ){
     return tmp;
 }
 
-bool endsWth(const std::string &str, const std::string &cmp){
+bool endsWith(const std::string &str, const std::string &cmp){
     if (str.length() >= cmp.length()) {
         return (0 == str.compare (str.length() - cmp.length(), cmp.length(), cmp));
     } else {
@@ -89,5 +94,24 @@ bool endsWth(const std::string &str, const std::string &cmp){
     }
 }
 
+bool startsWith(const std::string &str, const std::string &cmp){
+    if(str.length() >= cmp.length()){
+        return (0 == str.compare(0, cmp.length(), cmp));
+    }else{
+        return false;
+    }
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> result;
+    std::stringstream ss (s);
+    std::string item;
+
+    while (getline (ss, item, delim)) {
+        result.push_back (item);
+    }
+
+    return result;
+}
 
 #endif //SHOWTAP_CORE_LIBRARY_ESTRING_H

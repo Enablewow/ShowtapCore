@@ -8,22 +8,13 @@
 #include <showtap_file_reader.hpp>
 
 int FileReader::extract(){
-    if(!stream.is_open()) return ERR_FILE_EMPTY;
+    if(!stream.is_open() || length == 0) return ERR_FILE_EMPTY;
     if(dest.empty()) return ERR_DESTINATION_EMPTY;
-
-    int f = stream.tellg();
-    stream.seekg(0, ios::end);
-    int e = stream.tellg();
-
-    int size = e - f;
-    stream.seekg(0, ios::beg);
-
-    log("Showtap File Size: %d", size);
 
     extractBinaryThumbnail();
     extractBinaryResources();
 
-    //stream.close();
+    log(metadata.getFilename());
 
     return 0;
 }
@@ -42,25 +33,68 @@ void FileReader::extractBinaryResources() {
     //log("Content Size: %d", size);
     stream.seekg(sizeof(unsigned long), ios::cur);
 
-    while(!stream.eof()){
+    ofstream fos;
+
+    while(isAvaliable()){
+        // 파일 이름을 가져온다
         long nsize = readSize();
-
-        string fname = readString(nsize, true);
-        long fsize = readSize();
-
-        if(endsWth(fname, F_EXT_METADATA)){
-            log("Metadata File length: %d", fsize);
-            string metadatas = readString(fsize);
-
-            log("%s", metadatas.c_str());
-        }else{
-            log("%s Store file...", fname.c_str());
+        string fpath = readString(nsize, true);
+        if(startsWith(fpath, "./")){
+            fpath = fpath.replace(0, 2, "");
         }
 
-        stream.seekg(fsize, ios::cur);
+        string fdest = dest + "/" + fpath;
+
+        // 파일 Binary 를 가져온다.
+        long fsize = readSize();
+
+        fos.open(fdest, ios::in | ios::out | ios::binary);
+        fos.seekp(0, ios::beg);
+
+        int of = fos.tellp();
+        fos.seekp(0, ios::end);
+        int oe = fos.tellp();
+
+        fos.seekp(0, ios::beg);
+
+        int osize = oe - of;
+        log("Exist: %d File: %d", osize, fsize);
+
+        if(osize > 0 && osize == fsize) {
+            // 같은 정보의 데이터라면 저장을 스킵한다.
+            stream.seekg(fsize, ios::cur);
+        }else{
+            if(!existDirectory(fdest.c_str()))
+                makeDirectory(fdest);
+
+            if(endsWith(fpath, F_EXT_METADATA)){
+                string metadatas = readString(fsize);
+
+                fos.write(metadatas.c_str(), metadatas.size());
+
+                metadata.import(metadatas);
+            }else{
+                int bs = F_COPY_BUFFER;
+                long remain = fsize;
+
+                while(remain > 0){
+                    if(remain - bs < 0)
+                        bs = (int) remain;
+
+                    char buf[bs];
+
+                    stream.read(buf, bs);
+                    fos.write(buf, bs);
+
+                    remain -= bs;
+                }
+            }
+        }
+
+        fos.close();
     }
 
-    log("Parse end??");
+    stream.close();
 }
 
 long FileReader::readSize() {

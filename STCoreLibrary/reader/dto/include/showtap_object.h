@@ -5,9 +5,9 @@
 #ifndef SHOWTAP_CORE_LIBRARY_SHOWTAP_OBJECT_H
 #define SHOWTAP_CORE_LIBRARY_SHOWTAP_OBJECT_H
 
-#include "abs_json.h"
+#include <dto/include/abs_json.h>
 
-class showtap_object {
+class ShowtapObject : public BaseJson {
 
 };
 
