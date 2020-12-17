@@ -6,12 +6,15 @@
 #define SHOWTAP_CORE_LIBRARY_EFILE_H
 
 #include <iostream>
+
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #include <extension/estring.h>
 
 #define F_COPY_BUFFER 1024 * 8
+#define F_DIR_PERMISSION 0771
+
 
 bool existDirectory(const char*);
 
@@ -39,7 +42,7 @@ std::string getFilenameFromPath(std::string const &path, bool removeExtension = 
  * @return
  */
 std::string getTemporaryDirectory(){
-    return std::string(root) + "/temp";
+    return std::string(::root) + "/temp";
 }
 
 /**
@@ -61,7 +64,7 @@ std::string getTemporaryStapDirectory(std::string const &filename){
  *
  * @return
  */
-bool makeDirectory(std::string const &path, std::string const &r = std::string(root)){
+bool makeDirectory(std::string const &path, std::string const &r = std::string(::root)){
     std::string _path = path;
     std::string _rel = _path.replace(0, r.length(), "");
 
@@ -78,10 +81,20 @@ bool makeDirectory(std::string const &path, std::string const &r = std::string(r
         dir += "/" + *iter;
         const char *_dir = dir.c_str();
 
-        if(!existDirectory(_dir)) mkdir(_dir, S_IRWXU);
+        if(!existDirectory(_dir)) {
+            if(mkdir(_dir, F_DIR_PERMISSION) == 0){
+                chmod(_dir, F_DIR_PERMISSION);
+            }
+        }
     }
 
     return true;
+}
+
+bool exist(const char *path){
+    struct stat info{};
+
+    return stat(path, &info) == 0;
 }
 
 bool existDirectory(const char *path){

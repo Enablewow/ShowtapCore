@@ -1305,7 +1305,7 @@ public:
             Otherwise returns \ref MemberEnd().
 
         \note Earlier versions of Rapidjson returned a \c NULL pointer, in case
-            the requested member doesn't exist. For consistency with e.g.
+            the requested member doesn't existPath. For consistency with e.g.
             \c std::map, this has been changed to MemberEnd() now.
         \note Linear time complexity.
     */
@@ -1325,7 +1325,7 @@ public:
             Otherwise returns \ref MemberEnd().
 
         \note Earlier versions of Rapidjson returned a \c NULL pointer, in case
-            the requested member doesn't exist. For consistency with e.g.
+            the requested member doesn't existPath. For consistency with e.g.
             \c std::map, this has been changed to MemberEnd() now.
         \note Linear time complexity.
     */

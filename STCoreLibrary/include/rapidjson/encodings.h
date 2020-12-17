@@ -64,7 +64,7 @@ concept Encoding {
 
     // The following functions are deal with byte streams.
 
-    //! Take a character from input byte stream, skip BOM if exist.
+    //! Take a character from input byte stream, skip BOM if existPath.
     template <typename InputByteStream>
     static CharType TakeBOM(InputByteStream& is);
 

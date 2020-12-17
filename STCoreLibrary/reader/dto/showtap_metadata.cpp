@@ -2,7 +2,7 @@
 // Created by 이종일 on 2020/12/16.
 //
 
-#include "dto/include/showtap_metadata.h"
+#include <dto/include/showtap_metadata.h>
 
 bool ShowtapMetadata::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     writer->StartObject();
@@ -34,10 +34,10 @@ bool ShowtapMetadata::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writ
     writer->String(K_META_POINTER_SIZE);
     writer->Int(pointer.size);
 
+    /*
     writer->String(K_META_BACKGROUND);
     writer->Int(background);
 
-    /*
     writer->String(K_META_PAGES);
     writer->StartArray();
 
@@ -61,7 +61,6 @@ bool ShowtapMetadata::deserialize(rapidjson::Value &value) {
     currentIndex = value[K_META_CURRENT_INDEX].GetInt();
     pointer.index = value[K_META_POINTER_INDEX].GetInt();
     pointer.size = value[K_META_POINTER_SIZE].GetInt();
-    //background = value[K_META_BACKGROUND].GetString();
 
     return true;
 }

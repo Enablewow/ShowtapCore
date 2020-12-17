@@ -8,7 +8,7 @@
 #ifndef constants_hpp
 #define constants_hpp
 
-#include <stdio.h>
+#include <iostream>
 #include <errors.hpp>
 
 #define ARGS_HELP "help"
@@ -31,7 +31,7 @@
 
 #define F_EXT_METADATA ".info"
 
-const char* root = nullptr;
+const char * root = nullptr;
 
 void log(const char *format, ...){
     va_list args;
@@ -41,21 +41,21 @@ void log(const char *format, ...){
 
     vsprintf(buf, format, args);
 
-    #ifdef PLATFORM
-        #if PLATFORM == ANDROID
+#ifdef PLATFORM
+    #if PLATFORM == ANDROID
             __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, buf, nullptr);
         #endif
-    #endif
+#endif
 
     va_end(args);
 }
 
 void log(std::string text){
-    #ifdef PLATFORM
-        #if PLATFORM == ANDROID
+#ifdef PLATFORM
+    #if PLATFORM == ANDROID
             __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, text.c_str(), nullptr);
         #endif
-    #endif
+#endif
 }
 
 #endif /* constants_hpp */

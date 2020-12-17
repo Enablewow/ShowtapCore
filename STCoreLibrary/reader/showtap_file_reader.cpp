@@ -15,6 +15,7 @@ int FileReader::extract(){
     extractBinaryResources();
 
     log(metadata.getFilename());
+    log("code: %s", intToHexCode(0xff444444).c_str());
 
     return 0;
 }
@@ -45,10 +46,20 @@ void FileReader::extractBinaryResources() {
 
         string fdest = dest + "/" + fpath;
 
+        // 파일의 폴더가 없으면 폴더를 만들어 준다.
+        if(!existDirectory(fdest.c_str()))
+            makeDirectory(fdest);
+
         // 파일 Binary 를 가져온다.
         long fsize = readSize();
 
-        fos.open(fdest, ios::in | ios::out | ios::binary);
+        bool _exist = exist(fdest.c_str());
+
+        //log("Path: %s, Exist %s", fpath.c_str(), _exist ? "true" : "false");
+
+        int flag = _exist ? (ios::in | ios::out) : ios::out;
+
+        fos.open(fdest, flag | ios::binary);
         fos.seekp(0, ios::beg);
 
         int of = fos.tellp();
@@ -58,22 +69,20 @@ void FileReader::extractBinaryResources() {
         fos.seekp(0, ios::beg);
 
         int osize = oe - of;
-        log("Exist: %d File: %d", osize, fsize);
 
-        if(osize > 0 && osize == fsize) {
-            // 같은 정보의 데이터라면 저장을 스킵한다.
+        if(osize > 0 && osize == fsize) { // 같은 정보의 데이터라면 저장을 스킵한다.
             stream.seekg(fsize, ios::cur);
         }else{
-            if(!existDirectory(fdest.c_str()))
-                makeDirectory(fdest);
-
             if(endsWith(fpath, F_EXT_METADATA)){
+                //log("Extract Metadatas");
                 string metadatas = readString(fsize);
 
                 fos.write(metadatas.c_str(), metadatas.size());
 
                 metadata.import(metadatas);
             }else{
+                //log("Extract file: %s size: %d", fpath.c_str(), fsize);
+
                 int bs = F_COPY_BUFFER;
                 long remain = fsize;
 
@@ -88,6 +97,8 @@ void FileReader::extractBinaryResources() {
 
                     remain -= bs;
                 }
+
+                //log("Extracted");
             }
         }
 

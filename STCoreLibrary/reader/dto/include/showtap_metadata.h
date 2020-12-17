@@ -24,7 +24,12 @@
 
 class ShowtapMetadata : public BaseJson {
     std::string name;
+
+#if PLATFORM == ANDROID
     char os = 'A';
+#elif PLATFORM == IOS
+    char os = 'I';
+#endif
 
     double ratio = 0.0;
     int version = 0;

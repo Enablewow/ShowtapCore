@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include <regex>
+#include <iomanip>
 
 #define IS_ALNUM(ch) \
             ( ch >= 'a' && ch <= 'z' ) || \
@@ -19,6 +20,16 @@
             ( ch >= '-' && ch <= '.' )
 
 #define REGEX_EXTENSION std::regex("\\.[a-zA-Z0-4]+$")
+
+char* url_decode( const char *);
+char* url_encode( const char *);
+bool endsWith(const std::string &, const std::string &);
+bool startsWith(const std::string &, const std::string &);
+std::vector<std::string> split(const std::string &, char);
+int hexToIntColor(std::string const &);
+int hexToIntColor(const char *);
+std::string intToHexCode(unsigned int);
+
 
 char* url_decode( const char* str ){
 
@@ -112,6 +123,24 @@ std::vector<std::string> split(const std::string &s, char delim) {
     }
 
     return result;
+}
+
+int hexToIntColor(std::string const &str){
+    if(!startsWith(str, "#")) return 0;
+
+    return std::stoi(str.substr(1, str.size() - 1));
+}
+
+int hexToIntColor(const char *str){
+    return hexToIntColor(std::string(str));
+}
+
+std::string intToHexCode(unsigned int color){
+    std::stringstream stream;
+
+    stream << "#" << std::setw(8) << std::setfill('0') << std::hex << color;
+
+    return stream.str();
 }
 
 #endif //SHOWTAP_CORE_LIBRARY_ESTRING_H
