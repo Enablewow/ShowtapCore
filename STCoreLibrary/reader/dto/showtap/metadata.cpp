@@ -2,9 +2,11 @@
 // Created by 이종일 on 2020/12/16.
 //
 
-#include <dto/showtap_metadata.h>
+#include <dto/showtap/metadata.h>
 
-bool ShowtapMetadata::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
+using namespace showtap;
+
+bool Metadata::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     writer->StartObject();
 
     writer->String(K_META_VERSION);
@@ -49,7 +51,7 @@ bool ShowtapMetadata::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writ
     return true;
 }
 
-bool ShowtapMetadata::deserialize(rapidjson::Value &value) {
+bool Metadata::deserialize(rapidjson::Value &value) {
     version = value[K_META_VERSION].GetInt();
     os = value[K_META_OS].GetString()[0];
 
@@ -62,17 +64,29 @@ bool ShowtapMetadata::deserialize(rapidjson::Value &value) {
     pointer.index = value[K_META_POINTER_INDEX].GetInt();
     pointer.size = value[K_META_POINTER_SIZE].GetInt();
 
+    for(auto &a : value[K_META_PAGES].GetArray()){
+        Page _p;
+
+        _p.deserialize(a);
+
+        p.push_back(_p);
+    }
+
     background = !value[K_META_BACKGROUND].IsNull() ? UString::hexToIntColor(value[K_META_BACKGROUND].GetString()) : 0x000000;
 
     return true;
 }
 
-const char* ShowtapMetadata::toString() const {
-    char *buf = nullptr;
+int Metadata::findIndexById(long id) const {
+    int ret = -1, i = 0;
 
-    sprintf(buf, "filename : %s\n"
-                 "ratio : %f\n"
-                 "path: %s\n", name.c_str(), ratio, path.c_str());
+    for(auto iter = p.begin(); iter < p.end(); iter++, i++){
+        if(iter->getPageId() == id){
+            ret = iter->getPageId();
 
-    return buf;
+            break;
+        }
+    }
+
+    return ret;
 }

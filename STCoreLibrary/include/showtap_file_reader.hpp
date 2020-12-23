@@ -13,6 +13,7 @@
 
 #include <constants.hpp>
 #include <base64.h>
+#include <logger.h>
 
 #include <rapidjson/document.h>
 
@@ -20,7 +21,7 @@
 #include <extension/estring.h>
 
 #include <dto/thumbnail_info.h>
-#include <dto/showtap_metadata.h>
+#include <dto/showtap/metadata.h>
 
 using namespace std;
 using namespace macaron;
@@ -45,7 +46,7 @@ private:
     }
 
 public:
-    ShowtapMetadata metadata;
+    showtap::Metadata metadata;
 
     FileReader(const string& path){
         const char *_path = path.c_str();

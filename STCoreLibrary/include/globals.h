@@ -5,10 +5,10 @@
 #ifndef SHOWTAP_CORE_LIBRARY_GLOBALS_H
 #define SHOWTAP_CORE_LIBRARY_GLOBALS_H
 
-#include <dto/showtap_metadata.h>
+#include <dto/showtap/metadata.h>
 
 const char *root = nullptr;
-ShowtapMetadata data;
+showtap::Metadata data;
 
 struct Display {
     int width = 0;
