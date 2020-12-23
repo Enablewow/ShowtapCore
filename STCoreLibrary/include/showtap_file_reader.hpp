@@ -26,16 +26,12 @@ using namespace std;
 using namespace macaron;
 using namespace rapidjson;
 
-#endif /* showtap_file_reader_hpp */
-
 class FileReader {
 private:
     ifstream stream;
     int length = 0;
 
     string dest;
-
-    ShowtapMetadata metadata;
 
     void extractBinaryThumbnail();
     void extractBinaryResources();
@@ -49,11 +45,13 @@ private:
     }
 
 public:
+    ShowtapMetadata metadata;
+
     FileReader(const string& path){
         const char *_path = path.c_str();
 
-        string filename = getFilenameFromPath(path, true);
-        dest = getTemporaryStapDirectory(filename);
+        string filename = UFile::getFilenameFromPath(path, true);
+        dest = UFile::getTemporaryStapDirectory(filename);
 
         stream.open(_path, ios_base::in | ios_base::binary);
 
@@ -67,3 +65,5 @@ public:
     
     int extract();
 };
+
+#endif /* showtap_file_reader_hpp */

@@ -10,8 +10,9 @@
 
 #include <stdio.h>
 
-#define ERR_SOURCE_EMPTY -1000
-#define ERR_DESTINATION_EMPTY -1001
-#define ERR_FILE_EMPTY -1002
+#define ERR_EMPTY_SOURCE -1000
+#define ERR_EMPTY_DESTINATION -1001
+#define ERR_EMPTY_FILE -1002
+#define ERR_EMPTY_ROOT_DIRECTORY -1003
 
 #endif /* errors_hpp */

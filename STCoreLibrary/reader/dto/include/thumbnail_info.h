@@ -12,8 +12,6 @@
 #define K_THUMB_DATA "thumbDataString"
 #define K_THUMB_NAME "thumbFullName"
 
-#endif //SHOWTAP_CORE_LIBRARY_THUMBNAILINFO_H
-
 class thumbnail_info : public BaseJson {
     std::stringstream data;
     std::string name;
@@ -28,3 +26,5 @@ public:
 
     virtual ~thumbnail_info();
 };
+
+#endif //SHOWTAP_CORE_LIBRARY_THUMBNAILINFO_H

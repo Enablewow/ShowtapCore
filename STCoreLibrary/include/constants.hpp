@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <errors.hpp>
+#include <globals.h>
 
 #define ARGS_HELP "help"
 
@@ -31,32 +32,33 @@
 
 #define F_EXT_METADATA ".info"
 
-const char * root = nullptr;
+class Log {
+public :
+    static void print(const char *format, ...){
+        va_list args;
+        va_start(args, format);
 
-void log(const char *format, ...){
-    va_list args;
-    va_start(args, format);
+        char buf[LOG_BUF];
 
-    char buf[LOG_BUF];
+        vsprintf(buf, format, args);
 
-    vsprintf(buf, format, args);
-
-#ifdef PLATFORM
-    #if PLATFORM == ANDROID
-            __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, buf, nullptr);
+        #ifdef PLATFORM
+                #if PLATFORM == ANDROID
+                    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, buf, nullptr);
+                #endif
         #endif
-#endif
 
-    va_end(args);
-}
+        va_end(args);
+    }
 
-void log(std::string text){
-#ifdef PLATFORM
-    #if PLATFORM == ANDROID
-            __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, text.c_str(), nullptr);
+    static void print(std::string text){
+        #ifdef PLATFORM
+                #if PLATFORM == ANDROID
+                    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, text.c_str(), nullptr);
+                #endif
         #endif
-#endif
-}
+    }
+};
 
 #endif /* constants_hpp */
 

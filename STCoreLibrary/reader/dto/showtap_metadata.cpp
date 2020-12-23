@@ -62,14 +62,17 @@ bool ShowtapMetadata::deserialize(rapidjson::Value &value) {
     pointer.index = value[K_META_POINTER_INDEX].GetInt();
     pointer.size = value[K_META_POINTER_SIZE].GetInt();
 
+    background = !value[K_META_BACKGROUND].IsNull() ? UString::hexToIntColor(value[K_META_BACKGROUND].GetString()) : 0x000000;
+
     return true;
 }
 
-std::string ShowtapMetadata::toString() {
-    char *buf;
+const char* ShowtapMetadata::toString() const {
+    char *buf = nullptr;
+
     sprintf(buf, "filename : %s\n"
                  "ratio : %f\n"
                  "path: %s\n", name.c_str(), ratio, path.c_str());
 
-    return std::string(buf);
+    return buf;
 }

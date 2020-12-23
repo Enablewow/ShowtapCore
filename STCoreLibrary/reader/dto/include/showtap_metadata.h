@@ -6,7 +6,10 @@
 #define SHOWTAP_CORE_LIBRARY_SHOWTAP_METADATA_H
 
 #include <iostream>
+#include <cstdio>
+
 #include <dto/include/abs_json.h>
+#include <extension/estring.h>
 
 #define K_META_OS "os"
 #define K_META_VERSION "version"
@@ -17,10 +20,8 @@
 #define K_META_CURRENT_INDEX "currentIndex"
 #define K_META_POINTER_INDEX "pointerIndex"
 #define K_META_POINTER_SIZE "pointerSize"
-#define K_META_BACKGROUND "showBackgroundColor"
+#define K_META_BACKGROUND "showBackGroundColor"
 #define K_META_PAGES "showTapPages"
-
-#endif //SHOWTAP_CORE_LIBRARY_SHOWTAP_METADATA_H
 
 class ShowtapMetadata : public BaseJson {
     std::string name;
@@ -29,6 +30,8 @@ class ShowtapMetadata : public BaseJson {
     char os = 'A';
 #elif PLATFORM == IOS
     char os = 'I';
+#else
+    char os = 'D';
 #endif
 
     double ratio = 0.0;
@@ -53,5 +56,7 @@ public:
 
     std::string getFilename() const { return name; }
 
-    std::string toString();
+    const char* toString() const;
 };
+
+#endif //SHOWTAP_CORE_LIBRARY_SHOWTAP_METADATA_H

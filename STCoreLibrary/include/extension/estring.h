@@ -21,126 +21,120 @@
 
 #define REGEX_EXTENSION std::regex("\\.[a-zA-Z0-4]+$")
 
-char* url_decode( const char *);
-char* url_encode( const char *);
-bool endsWith(const std::string &, const std::string &);
-bool startsWith(const std::string &, const std::string &);
-std::vector<std::string> split(const std::string &, char);
-int hexToIntColor(std::string const &);
-int hexToIntColor(const char *);
-std::string intToHexCode(unsigned int);
+class UString {
 
+public:
+    static char* decodeURL(const char* str ){
 
-char* url_decode( const char* str ){
+        int i, j = 0, len;
+        char* tmp;
+        char hex[3];
 
-    int i, j = 0, len;
-    char* tmp;
-    char hex[3];
+        len = strlen( str );
+        hex[2] = 0;
 
-    len = strlen( str );
-    hex[2] = 0;
+        tmp = (char*)malloc( sizeof(char) * (len+1) );
 
-    tmp = (char*)malloc( sizeof(char) * (len+1) );
+        for( i = 0 ; i < len ; i++, j++ ){
 
-    for( i = 0 ; i < len ; i++, j++ ){
+            if( str[i] != '%' )
+                tmp[j] = str[i];
 
-        if( str[i] != '%' )
-            tmp[j] = str[i];
+            else{
 
-        else{
+                if( IS_ALNUM(str[i+1]) && IS_ALNUM(str[i+2]) && i < (len-2) ){
 
-            if( IS_ALNUM(str[i+1]) && IS_ALNUM(str[i+2]) && i < (len-2) ){
+                    hex[0] = str[i+1];
+                    hex[1] = str[i+2];
+                    tmp[j] = strtol( hex, nullptr, 16 );
 
-                hex[0] = str[i+1];
-                hex[1] = str[i+2];
-                tmp[j] = strtol( hex, nullptr, 16 );
+                    i += 2;
 
-                i += 2;
+                }
+                else
+                    tmp[j] = '%';
 
             }
-            else
-                tmp[j] = '%';
 
         }
+        tmp[j] = 0;
+
+        return tmp;
 
     }
-    tmp[j] = 0;
 
-    return tmp;
+    static char* encodeURL(const char* str ){
 
-}
+        int i, j = 0, len;
 
-char* url_encode( const char* str ){
+        char* tmp;
 
-    int i, j = 0, len;
+        len = strlen( str );
+        tmp = (char*) malloc( (sizeof(char) * 3 * len) +1 );
 
-    char* tmp;
+        for( i = 0 ; i < len ; i++ ){
 
-    len = strlen( str );
-    tmp = (char*) malloc( (sizeof(char) * 3 * len) +1 );
+            if( IS_ALNUM( str[i] ) )
+                tmp[j] = str[i];
 
-    for( i = 0 ; i < len ; i++ ){
+            else{
 
-        if( IS_ALNUM( str[i] ) )
-            tmp[j] = str[i];
+                snprintf( &tmp[j], 4, "%%%02X\n", (unsigned char)str[i] );
+                j += 2;
 
-        else{
-
-            snprintf( &tmp[j], 4, "%%%02X\n", (unsigned char)str[i] );
-            j += 2;
+            }
+            j++;
 
         }
-        j++;
-
-    }
-    tmp[j] = 0;
-    return tmp;
-}
-
-bool endsWith(const std::string &str, const std::string &cmp){
-    if (str.length() >= cmp.length()) {
-        return (0 == str.compare (str.length() - cmp.length(), cmp.length(), cmp));
-    } else {
-        return false;
-    }
-}
-
-bool startsWith(const std::string &str, const std::string &cmp){
-    if(str.length() >= cmp.length()){
-        return (0 == str.compare(0, cmp.length(), cmp));
-    }else{
-        return false;
-    }
-}
-
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> result;
-    std::stringstream ss (s);
-    std::string item;
-
-    while (getline (ss, item, delim)) {
-        result.push_back (item);
+        tmp[j] = 0;
+        return tmp;
     }
 
-    return result;
-}
+    static bool endsWith(const std::string &str, const std::string &cmp){
+        if (str.length() >= cmp.length()) {
+            return (0 == str.compare (str.length() - cmp.length(), cmp.length(), cmp));
+        } else {
+            return false;
+        }
+    }
 
-int hexToIntColor(std::string const &str){
-    if(!startsWith(str, "#")) return 0;
+    static bool startsWith(const std::string &str, const std::string &cmp){
+        if(str.length() >= cmp.length()){
+            return (0 == str.compare(0, cmp.length(), cmp));
+        }else{
+            return false;
+        }
+    }
 
-    return std::stoi(str.substr(1, str.size() - 1));
-}
+    static std::vector<std::string> split(const std::string &s, char delim) {
+        std::vector<std::string> result;
+        std::stringstream ss (s);
+        std::string item;
 
-int hexToIntColor(const char *str){
-    return hexToIntColor(std::string(str));
-}
+        while (getline (ss, item, delim)) {
+            result.push_back (item);
+        }
 
-std::string intToHexCode(unsigned int color){
-    std::stringstream stream;
+        return result;
+    }
 
-    stream << "#" << std::setw(8) << std::setfill('0') << std::hex << color;
+    static int hexToIntColor(std::string const &str){
+        if(!startsWith(str, "#")) return 0;
 
-    return stream.str();
-}
+        return std::stoi(str.substr(1, str.size() - 1));
+    }
+
+    static int hexToIntColor(const char *str){
+        return hexToIntColor(std::string(str));
+    }
+
+    static std::string intToHexCode(unsigned int color){
+        std::stringstream stream;
+
+        stream << "#" << std::setw(8) << std::setfill('0') << std::hex << color;
+
+        return stream.str();
+    }
+};
 
 #endif //SHOWTAP_CORE_LIBRARY_ESTRING_H
