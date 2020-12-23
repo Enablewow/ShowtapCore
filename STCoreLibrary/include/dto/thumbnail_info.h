@@ -7,12 +7,12 @@
 
 #include <iostream>
 #include <sstream>
-#include <dto/include/abs_json.h>
+#include <dto/abs_json.h>
 
 #define K_THUMB_DATA "thumbDataString"
 #define K_THUMB_NAME "thumbFullName"
 
-class thumbnail_info : public BaseJson {
+class ThumbnailInfo : public BaseJson {
     std::stringstream data;
     std::string name;
 
@@ -24,7 +24,7 @@ public:
 
     const char* getName(){ return name.c_str(); }
 
-    virtual ~thumbnail_info();
+    virtual ~ThumbnailInfo();
 };
 
 #endif //SHOWTAP_CORE_LIBRARY_THUMBNAILINFO_H

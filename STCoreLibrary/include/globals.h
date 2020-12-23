@@ -5,7 +5,7 @@
 #ifndef SHOWTAP_CORE_LIBRARY_GLOBALS_H
 #define SHOWTAP_CORE_LIBRARY_GLOBALS_H
 
-#include <dto/include/showtap_metadata.h>
+#include <dto/showtap_metadata.h>
 
 const char *root = nullptr;
 ShowtapMetadata data;

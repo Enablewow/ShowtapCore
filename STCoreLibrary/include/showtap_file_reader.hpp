@@ -19,8 +19,8 @@
 #include <extension/efile.h>
 #include <extension/estring.h>
 
-#include <dto/include/thumbnail_info.h>
-#include <dto/include/showtap_metadata.h>
+#include <dto/thumbnail_info.h>
+#include <dto/showtap_metadata.h>
 
 using namespace std;
 using namespace macaron;

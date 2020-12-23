@@ -23,7 +23,7 @@ void FileReader::extractBinaryThumbnail() {
     long size = readSize();
     string decoded = readString(size);
 
-    thumbnail_info th;
+    ThumbnailInfo th;
     th.import(decoded);
 }
 

@@ -8,7 +8,7 @@
 #include <iostream>
 #include <cstdio>
 
-#include <dto/include/abs_json.h>
+#include <dto/abs_json.h>
 #include <extension/estring.h>
 
 #define K_META_OS "os"

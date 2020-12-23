@@ -2,7 +2,7 @@
 // Created by 이종일 on 2020/12/16.
 //
 
-#include <dto/include/showtap_metadata.h>
+#include <dto/showtap_metadata.h>
 
 bool ShowtapMetadata::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     writer->StartObject();
