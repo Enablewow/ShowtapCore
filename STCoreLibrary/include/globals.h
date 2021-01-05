@@ -5,18 +5,13 @@
 #ifndef SHOWTAP_CORE_LIBRARY_GLOBALS_H
 #define SHOWTAP_CORE_LIBRARY_GLOBALS_H
 
-#include <dto/showtap/metadata.h>
+//#include <display.h>
+//#include <dto/showtap/metadata.h>
 
 const char *root = nullptr;
-showtap::Metadata data;
+const char *path_metadata = nullptr;
 
-struct Display {
-    int width = 0;
-    int height = 0;
-
-    double ratio = 0.0;
-
-    bool isVertical() const { return width < height; }
-} display;
+//showtap::Metadata data;
+//showtap::Display display;
 
 #endif //SHOWTAP_CORE_LIBRARY_GLOBALS_H

@@ -31,9 +31,10 @@ bool Page::deserialize(rapidjson::Value &value) {
     background = r;
 
     auto arr = value[K_PAGE_OBJECT].GetArray();
-    Object temp;
+    Object *temp;
     for(auto iter = arr.begin(); iter < arr.end(); iter++){
-        temp.deserialize(*iter);
+        temp = new Tapcon();
+        temp->deserialize(*iter);
 
         children.push_back(temp);
     }

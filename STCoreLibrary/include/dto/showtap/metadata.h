@@ -35,7 +35,6 @@ namespace showtap {
 #else
     char os = 'D';
 #endif
-
         double ratio = 0.0;
         int version = 0;
 
@@ -60,6 +59,8 @@ namespace showtap {
 
         std::string getFilename() const { return name; }
         std::vector<Page> getPages() const { return p; }
+
+        double getFileRatio() const { return ratio; }
 
         int findIndexById(long id) const;
     };

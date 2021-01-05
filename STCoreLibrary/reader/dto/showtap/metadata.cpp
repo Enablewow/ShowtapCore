@@ -36,10 +36,11 @@ bool Metadata::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) con
     writer->String(K_META_POINTER_SIZE);
     writer->Int(pointer.size);
 
-    /*
-    writer->String(K_META_BACKGROUND);
-    writer->Int(background);
 
+    writer->String(K_META_BACKGROUND);
+    writer->String(UString::intToHexCode(background).c_str());
+
+    /*
     writer->String(K_META_PAGES);
     writer->StartArray();
 

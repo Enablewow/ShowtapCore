@@ -8,6 +8,10 @@
 #include <vector>
 
 #include <dto/abs_json.h>
+#include <dto/showtap/enumerates.h>
+
+#include <extension/estring.h>
+#include <display.h>
 #include <logger.h>
 
 #define K_OBJECT_POSITION_X "x"
@@ -21,10 +25,15 @@
 #define K_OBJECT_CHILDREN "childs"
 #define K_OBJECT_EFFECT "effect"
 #define K_OBJECT_OPTION "additionalOption"
+#define K_OBJECT_TYPE "showObjectType"
 
 
 namespace showtap {
-    class Object : public BaseJson {
+    class Object {
+    protected:
+        Type type;
+        std::string tag = UString::UUID();
+
         double x = 0.0, y = 0.0;
         double width = 0.0, height = 0.0;
 
@@ -33,22 +42,81 @@ namespace showtap {
 
         float alpha = 0.0f;
 
-        std::vector<Object> child;
+        std::vector<Object *> child;
 
     public:
-        bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
-        bool deserialize(rapidjson::Value &value) override;
+        explicit Object(const Type _type = Type::None) : type(_type) {}
+        ~Object(){
+            child.clear();
+        }
+
+        void setCommonAttributes(rapidjson::Value &value);
+        void setChildAttrributes(rapidjson::Value &value);
+
+        virtual Object deserialize(rapidjson::Value &value) { return Object(); };
+
+        const char* toString(){
+            char buf[256];
+
+            sprintf(buf, "Object: %s", tag.c_str());
+
+            return buf;
+        }
     };
 
-    class Tapcon : public Object {};
-    class Group : public Object {};
-    class Image : public Object {};
-    class Video : public Object {};
-    class Audio : public Object {};
-    class Mark : public Object {};
-    class URL : public Object {};
-    class Text : public Object {};
-    class Slide : public Object {};
+    class Tapcon : public Object {
+    public:
+        Tapcon() : Object(Type::Tapcon){}
+        Object deserialize(rapidjson::Value &value) override;
+    };
+
+    class Group : public Object {
+    public:
+        Group() : Object(Type::Group){}
+        Object deserialize(rapidjson::Value &value) override;
+    };
+
+    class Image : public Object {
+    public:
+        Image() : Object(Type::Image){}
+        Object deserialize(rapidjson::Value &value) override;
+    };
+
+    class Video : public Object {
+    public:
+        Video() : Object(Type::Video){}
+        Object deserialize(rapidjson::Value &value) override;
+    };
+
+    class Audio : public Object {
+    public:
+        Audio() : Object(Type::Audio){}
+        Object deserialize(rapidjson::Value &value) override;
+    };
+
+    class Mark : public Object {
+    public:
+        Mark() : Object(Type::Mark){}
+        Object deserialize(rapidjson::Value &value) override;
+    };
+
+    class URL : public Object {
+    public:
+        URL() : Object(Type::URL){}
+        Object deserialize(rapidjson::Value &value) override;
+    };
+
+    class Text : public Object {
+    public:
+        Text() : Object(Type::Text){}
+        Object deserialize(rapidjson::Value &value) override;
+    };
+
+    class Slide : public Object {
+    public:
+        Slide() : Object(Type::Slide){}
+        Object deserialize(rapidjson::Value &value) override;
+    };
 }
 
 

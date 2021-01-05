@@ -12,7 +12,7 @@ set(_DTO
 add_library(stap_reader SHARED
         showtap_file_reader.cpp
 
-        ${_DTO})
+        ${_DTO} display.cpp)
 
 target_include_directories(stap_reader
         PUBLIC ${CMAKE_SOURCE_DIR}/include

@@ -33,7 +33,7 @@ namespace showtap {
         bool isHidden = false;
         Resource background;
 
-        std::vector<Object> children;
+        std::vector<Object *> children;
 
     public:
         bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
@@ -43,6 +43,7 @@ namespace showtap {
         Background getBackgroundType() const;
 
         int getChildrenSize() const { return children.size(); }
+        std::vector<Object *> getChildren() const { return children; }
     };
 }
 

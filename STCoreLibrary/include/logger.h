@@ -30,8 +30,8 @@ public :
     static void print(std::string text){
 #ifdef PLATFORM
         #if PLATFORM == ANDROID
-                    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, text.c_str(), nullptr);
-                #endif
+            __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, text.c_str(), nullptr);
+        #endif
 #endif
     }
 };

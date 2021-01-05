@@ -10,18 +10,20 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
 
 #include <constants.hpp>
 #include <base64.h>
 #include <logger.h>
 
 #include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
 
 #include <extension/efile.h>
 #include <extension/estring.h>
 
 #include <dto/thumbnail_info.h>
-#include <dto/showtap/metadata.h>
+//#include <dto/showtap/metadata.h>
 
 using namespace std;
 using namespace macaron;
@@ -33,21 +35,21 @@ private:
     int length = 0;
 
     string dest;
+    string path_metadata;
+
+    map<string, string> renameMap;
 
     void extractBinaryThumbnail();
     void extractBinaryResources();
+    void remappingChangedFile();
 
     long readSize();
     string readString(long);
     string readString(long, bool);
 
-    bool isAvaliable(){
-        return stream.tellg() < length;
-    }
+    bool isAvaliable(){ return stream.tellg() < length; }
 
 public:
-    showtap::Metadata metadata;
-
     FileReader(const string& path){
         const char *_path = path.c_str();
 
@@ -65,6 +67,7 @@ public:
     }
     
     int extract();
+    string getMetadataPath() const { return path_metadata; }
 };
 
 #endif /* showtap_file_reader_hpp */

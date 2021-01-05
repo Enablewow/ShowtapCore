@@ -12,12 +12,15 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/document.h>
 
+#include <logger.h>
+#include <extension/estring.h>
+
 class BaseJson {
     virtual bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const = 0;
     virtual bool deserialize(rapidjson::Value &value) = 0;
 
 public:
-    bool import(std::string json){
+    bool import(const std::string& json){
         rapidjson::Document d;
 
         d.Parse(json.c_str());

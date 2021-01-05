@@ -14,17 +14,17 @@ int FileReader::extract(){
     extractBinaryThumbnail();
     extractBinaryResources();
 
-    data = metadata;
+    remappingChangedFile();
 
     return RESULT_OK;
 }
 
 void FileReader::extractBinaryThumbnail() {
     long size = readSize();
-    string decoded = readString(size);
+    string json = readString(size);
 
     ThumbnailInfo th;
-    th.import(decoded);
+    th.import(json);
 }
 
 void FileReader::extractBinaryResources() {
@@ -39,9 +39,18 @@ void FileReader::extractBinaryResources() {
         // 파일 이름을 가져온다
         long nsize = readSize();
         string fpath = readString(nsize, true);
-        if(UString::startsWith(fpath, "./")){
-            fpath = fpath.replace(0, 2, "");
+
+        // 파일이름이 너무 길면 파일명을 자른 후 저장소에 저장 한다.
+        string origName = UFile::getFilenameFromPath(fpath);
+        string newName = UFile::shortenFilename(origName);
+        if(origName != newName){
+            renameMap[origName] = newName;
+
+            UString::replace(fpath, origName, newName);
         }
+
+        if(UString::startsWith(fpath, "./"))
+            fpath = fpath.replace(0, 2, "");
 
         string fdest = dest + "/" + fpath;
 
@@ -51,10 +60,9 @@ void FileReader::extractBinaryResources() {
 
         // 파일 Binary 를 가져온다.
         long fsize = readSize();
+        Log::print("Extract file: %s (ns: %d) size: %d", fpath.c_str(), nsize, fsize);
 
         bool _exist = UFile::exist(fdest.c_str());
-
-        //print("Path: %s, Exist %s", fpath.c_str(), _exist ? "true" : "false");
 
         int flag = _exist ? (ios::in | ios::out) : ios::out;
 
@@ -71,30 +79,29 @@ void FileReader::extractBinaryResources() {
 
         if(osize > 0 && osize == fsize) { // 같은 정보의 데이터라면 저장을 스킵한다.
             stream.seekg(fsize, ios::cur);
+
+            if(UString::endsWith(fpath, F_EXT_METADATA))
+                path_metadata = fdest;
+
         }else{
             if(UString::endsWith(fpath, F_EXT_METADATA)){
-                //print("Extract Metadatas");
                 string metadatas = readString(fsize);
 
                 fos.write(metadatas.c_str(), metadatas.size());
 
-                metadata.import(metadatas);
+                path_metadata = fdest;
             }else{
-                //print("Extract file: %s size: %d", fpath.c_str(), fsize);
+                char buf[F_COPY_BUFFER];
 
-                int bs = F_COPY_BUFFER;
-                long remain = fsize;
-
-                while(remain > 0){
-                    if(remain - bs < 0)
-                        bs = (int) remain;
-
-                    char buf[bs];
+                size_t i = 0, bs = sizeof buf;
+                while(i < fsize){
+                    if(fsize - i < bs) bs = fsize - i;
+                    //Log::print("Size: %d / %d Buffer Size: %d", size, i, bs);
 
                     stream.read(buf, bs);
                     fos.write(buf, bs);
 
-                    remain -= bs;
+                    i += bs;
                 }
 
                 //print("Extracted");
@@ -108,25 +115,43 @@ void FileReader::extractBinaryResources() {
 }
 
 long FileReader::readSize() {
-    unsigned long buf_size;
+    char *buf = new char[sizeof(long)];
+    stream.read(buf, sizeof buf);
 
-    stream.get(reinterpret_cast<char *>(&buf_size), sizeof buf_size);
-    stream.seekg(1, ios::cur);
+    long size =
+            (buf[3] << 24) |
+            (buf[2] << 16) |
+            (buf[1] << 8) |
+            (buf[0]);
 
-    return buf_size & 0xfffffff;
+    //Log::print("Buffer Size: %d Word: %s real size: %d", sizeof buf, buf, size);
+
+    delete[] buf;
+
+    return size;
 }
 
 string FileReader::readString(long size) {
-    char buf;
-    string text;
+    stringstream ss;
 
-    for(int i=0; i<size; i++){
-        stream.get(buf);
+    char buf[F_COPY_BUFFER];
 
-        text += buf;
+    size_t i = 0, bs = sizeof buf;
+    while(i < size){
+        if(size - i < bs) bs = size - i;
+        //Log::print("Size: %d / %d Buffer Size: %d", size, i, bs);
+
+        stream.read(buf, bs);
+        ss.write(buf, bs);
+
+        i += bs;
     }
 
-    string decoded(UString::decodeURL(text.c_str()));
+    string decoded(UString::decodeURL(ss.str().c_str()));
+    ss.flush();
+
+    //Log::print("End: %s", UString::endFrom(decoded, 30).c_str());
+    //Log::print("%s ... %s", text.substr(0, 30).c_str(), UString::endFrom(text, 30).c_str());
 
     return decoded;
 }
@@ -142,3 +167,8 @@ string FileReader::readString(long size, bool decodeBase64) {
     return decode;
 }
 
+void FileReader::remappingChangedFile() {
+    if (renameMap.empty()) return;
+
+
+}

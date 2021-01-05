@@ -9,11 +9,20 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <regex>
 
 #include <extension/estring.h>
+#include <logger.h>
 
-#define F_COPY_BUFFER 1024 * 8
+#ifndef REGEX_EXTENSION
+    #define REGEX_EXTENSION std::regex("\\.([a-zA-Z0-4]+)$")
+#endif
+
+#define F_BUFFER 1024
+#define F_COPY_BUFFER (F_BUFFER * 8)
 #define F_DIR_PERMISSION 0771
+
+#define F_MAX_LENGTH_FILENAME 256
 
 class UFile {
 public :
@@ -32,6 +41,25 @@ public :
         split = split.replace(split.find_last_of('.'), split.size(), "");
 
         return split;
+    }
+
+    static std::string getExtension(std::string const &name) {
+        std::smatch matched;
+        std::regex_search(name, matched, std::regex("\\.([a-zA-Z0-4]+)$"));
+
+        return matched[1].str();
+    }
+
+    static std::string shortenFilename(std::string const &name) {
+        if(name.length() < F_MAX_LENGTH_FILENAME) return name;
+
+        std::string newName = UString::utf8_substr(name, 0, 20);
+        std::string ext = getExtension(name);
+
+        newName += "_1";
+        newName += "." + ext;
+
+        return newName;
     }
 
     /**
