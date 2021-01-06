@@ -280,71 +280,71 @@ inline const char* SkipWhitespace(const char* p, const char* end) {
 
 #ifdef RAPIDJSON_SSE42
 //! Skip whitespace with SSE 4.2 pcmpistrm instruction, testing 16 8-byte characters at once.
-inline const char *SkipWhitespace_SIMD(const char* p) {
+inline const char *SkipWhitespace_SIMD(const char* pages) {
     // Fast return for single non-whitespace
-    if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-        ++p;
+    if (*pages == ' ' || *pages == '\n' || *pages == '\r' || *pages == '\t')
+        ++pages;
     else
-        return p;
+        return pages;
 
     // 16-byte align to the next boundary
-    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
-    while (p != nextAligned)
-        if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-            ++p;
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
+    while (pages != nextAligned)
+        if (*pages == ' ' || *pages == '\n' || *pages == '\r' || *pages == '\t')
+            ++pages;
         else
-            return p;
+            return pages;
 
     // The rest of string using SIMD
     static const char whitespace[16] = " \n\r\t";
     const __m128i w = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespace[0]));
 
-    for (;; p += 16) {
-        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
+    for (;; pages += 16) {
+        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(pages));
         const int r = _mm_cmpistri(w, s, _SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | _SIDD_NEGATIVE_POLARITY);
         if (r != 16)    // some of characters is non-whitespace
-            return p + r;
+            return pages + r;
     }
 }
 
-inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
+inline const char *SkipWhitespace_SIMD(const char* pages, const char* end) {
     // Fast return for single non-whitespace
-    if (p != end && (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t'))
-        ++p;
+    if (pages != end && (*pages == ' ' || *pages == '\n' || *pages == '\r' || *pages == '\t'))
+        ++pages;
     else
-        return p;
+        return pages;
 
     // The middle of string using SIMD
     static const char whitespace[16] = " \n\r\t";
     const __m128i w = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespace[0]));
 
-    for (; p <= end - 16; p += 16) {
-        const __m128i s = _mm_loadu_si128(reinterpret_cast<const __m128i *>(p));
+    for (; pages <= end - 16; pages += 16) {
+        const __m128i s = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pages));
         const int r = _mm_cmpistri(w, s, _SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | _SIDD_NEGATIVE_POLARITY);
         if (r != 16)    // some of characters is non-whitespace
-            return p + r;
+            return pages + r;
     }
 
-    return SkipWhitespace(p, end);
+    return SkipWhitespace(pages, end);
 }
 
 #elif defined(RAPIDJSON_SSE2)
 
 //! Skip whitespace with SSE2 instructions, testing 16 8-byte characters at once.
-inline const char *SkipWhitespace_SIMD(const char* p) {
+inline const char *SkipWhitespace_SIMD(const char* pages) {
     // Fast return for single non-whitespace
-    if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-        ++p;
+    if (*pages == ' ' || *pages == '\n' || *pages == '\r' || *pages == '\t')
+        ++pages;
     else
-        return p;
+        return pages;
 
     // 16-byte align to the next boundary
-    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
-    while (p != nextAligned)
-        if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-            ++p;
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
+    while (pages != nextAligned)
+        if (*pages == ' ' || *pages == '\n' || *pages == '\r' || *pages == '\t')
+            ++pages;
         else
-            return p;
+            return pages;
 
     // The rest of string
     #define C16(c) { c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c }
@@ -356,8 +356,8 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
     const __m128i w2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[2][0]));
     const __m128i w3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[3][0]));
 
-    for (;; p += 16) {
-        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
+    for (;; pages += 16) {
+        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(pages));
         __m128i x = _mm_cmpeq_epi8(s, w0);
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w1));
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w2));
@@ -367,20 +367,20 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 #ifdef _MSC_VER         // Find the index of first non-whitespace
             unsigned long offset;
             _BitScanForward(&offset, r);
-            return p + offset;
+            return pages + offset;
 #else
-            return p + __builtin_ffs(r) - 1;
+            return pages + __builtin_ffs(r) - 1;
 #endif
         }
     }
 }
 
-inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
+inline const char *SkipWhitespace_SIMD(const char* pages, const char* end) {
     // Fast return for single non-whitespace
-    if (p != end && (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t'))
-        ++p;
+    if (pages != end && (*pages == ' ' || *pages == '\n' || *pages == '\r' || *pages == '\t'))
+        ++pages;
     else
-        return p;
+        return pages;
 
     // The rest of string
     #define C16(c) { c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c }
@@ -392,8 +392,8 @@ inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
     const __m128i w2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[2][0]));
     const __m128i w3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[3][0]));
 
-    for (; p <= end - 16; p += 16) {
-        const __m128i s = _mm_loadu_si128(reinterpret_cast<const __m128i *>(p));
+    for (; pages <= end - 16; pages += 16) {
+        const __m128i s = _mm_loadu_si128(reinterpret_cast<const __m128i *>(pages));
         __m128i x = _mm_cmpeq_epi8(s, w0);
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w1));
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w2));
@@ -403,41 +403,41 @@ inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
 #ifdef _MSC_VER         // Find the index of first non-whitespace
             unsigned long offset;
             _BitScanForward(&offset, r);
-            return p + offset;
+            return pages + offset;
 #else
-            return p + __builtin_ffs(r) - 1;
+            return pages + __builtin_ffs(r) - 1;
 #endif
         }
     }
 
-    return SkipWhitespace(p, end);
+    return SkipWhitespace(pages, end);
 }
 
 #elif defined(RAPIDJSON_NEON)
 
 //! Skip whitespace with ARM Neon instructions, testing 16 8-byte characters at once.
-inline const char *SkipWhitespace_SIMD(const char* p) {
+inline const char *SkipWhitespace_SIMD(const char* pages) {
     // Fast return for single non-whitespace
-    if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-        ++p;
+    if (*pages == ' ' || *pages == '\n' || *pages == '\r' || *pages == '\t')
+        ++pages;
     else
-        return p;
+        return pages;
 
     // 16-byte align to the next boundary
-    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
-    while (p != nextAligned)
-        if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-            ++p;
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
+    while (pages != nextAligned)
+        if (*pages == ' ' || *pages == '\n' || *pages == '\r' || *pages == '\t')
+            ++pages;
         else
-            return p;
+            return pages;
 
     const uint8x16_t w0 = vmovq_n_u8(' ');
     const uint8x16_t w1 = vmovq_n_u8('\n');
     const uint8x16_t w2 = vmovq_n_u8('\r');
     const uint8x16_t w3 = vmovq_n_u8('\t');
 
-    for (;; p += 16) {
-        const uint8x16_t s = vld1q_u8(reinterpret_cast<const uint8_t *>(p));
+    for (;; pages += 16) {
+        const uint8x16_t s = vld1q_u8(reinterpret_cast<const uint8_t *>(pages));
         uint8x16_t x = vceqq_u8(s, w0);
         x = vorrq_u8(x, vceqq_u8(s, w1));
         x = vorrq_u8(x, vceqq_u8(s, w2));
@@ -451,29 +451,29 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
         if (low == 0) {
             if (high != 0) {
                 uint32_t lz = internal::clzll(high);
-                return p + 8 + (lz >> 3);
+                return pages + 8 + (lz >> 3);
             }
         } else {
             uint32_t lz = internal::clzll(low);
-            return p + (lz >> 3);
+            return pages + (lz >> 3);
         }
     }
 }
 
-inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
+inline const char *SkipWhitespace_SIMD(const char* pages, const char* end) {
     // Fast return for single non-whitespace
-    if (p != end && (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t'))
-        ++p;
+    if (pages != end && (*pages == ' ' || *pages == '\n' || *pages == '\r' || *pages == '\t'))
+        ++pages;
     else
-        return p;
+        return pages;
 
     const uint8x16_t w0 = vmovq_n_u8(' ');
     const uint8x16_t w1 = vmovq_n_u8('\n');
     const uint8x16_t w2 = vmovq_n_u8('\r');
     const uint8x16_t w3 = vmovq_n_u8('\t');
 
-    for (; p <= end - 16; p += 16) {
-        const uint8x16_t s = vld1q_u8(reinterpret_cast<const uint8_t *>(p));
+    for (; pages <= end - 16; pages += 16) {
+        const uint8x16_t s = vld1q_u8(reinterpret_cast<const uint8_t *>(pages));
         uint8x16_t x = vceqq_u8(s, w0);
         x = vorrq_u8(x, vceqq_u8(s, w1));
         x = vorrq_u8(x, vceqq_u8(s, w2));
@@ -487,15 +487,15 @@ inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
         if (low == 0) {
             if (high != 0) {
                 uint32_t lz = internal::clzll(high);
-                return p + 8 + (lz >> 3);
+                return pages + 8 + (lz >> 3);
             }
         } else {
             uint32_t lz = internal::clzll(low);
-            return p + (lz >> 3);
+            return pages + (lz >> 3);
         }
     }
 
-    return SkipWhitespace(p, end);
+    return SkipWhitespace(pages, end);
 }
 
 #endif // RAPIDJSON_NEON
@@ -1075,17 +1075,17 @@ private:
 #if defined(RAPIDJSON_SSE2) || defined(RAPIDJSON_SSE42)
     // StringStream -> StackStream<char>
     static RAPIDJSON_FORCEINLINE void ScanCopyUnescapedString(StringStream& is, StackStream<char>& os) {
-        const char* p = is.src_;
+        const char* pages = is.src_;
 
-        // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
-        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
-        while (p != nextAligned)
-            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20)) {
-                is.src_ = p;
+        // Scan one by one until alignment (unaligned load may cross pages boundary and cause crash)
+        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
+        while (pages != nextAligned)
+            if (RAPIDJSON_UNLIKELY(*pages == '\"') || RAPIDJSON_UNLIKELY(*pages == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*pages) < 0x20)) {
+                is.src_ = pages;
                 return;
             }
             else
-                os.Put(*p++);
+                os.Put(*pages++);
 
         // The rest of string using SIMD
         static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
@@ -1095,8 +1095,8 @@ private:
         const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
         const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
 
-        for (;; p += 16) {
-            const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
+        for (;; pages += 16) {
+            const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(pages));
             const __m128i t1 = _mm_cmpeq_epi8(s, dq);
             const __m128i t2 = _mm_cmpeq_epi8(s, bs);
             const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x1F) == 0x1F
@@ -1114,16 +1114,16 @@ private:
                 if (length != 0) {
                     char* q = reinterpret_cast<char*>(os.Push(length));
                     for (size_t i = 0; i < length; i++)
-                        q[i] = p[i];
+                        q[i] = pages[i];
 
-                    p += length;
+                    pages += length;
                 }
                 break;
             }
             _mm_storeu_si128(reinterpret_cast<__m128i *>(os.Push(16)), s);
         }
 
-        is.src_ = p;
+        is.src_ = pages;
     }
 
     // InsituStringStream -> InsituStringStream
@@ -1136,19 +1136,19 @@ private:
             return;
         }
 
-        char* p = is.src_;
+        char* pages = is.src_;
         char *q = is.dst_;
 
-        // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
-        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
-        while (p != nextAligned)
-            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20)) {
-                is.src_ = p;
+        // Scan one by one until alignment (unaligned load may cross pages boundary and cause crash)
+        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
+        while (pages != nextAligned)
+            if (RAPIDJSON_UNLIKELY(*pages == '\"') || RAPIDJSON_UNLIKELY(*pages == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*pages) < 0x20)) {
+                is.src_ = pages;
                 is.dst_ = q;
                 return;
             }
             else
-                *q++ = *p++;
+                *q++ = *pages++;
 
         // The rest of string using SIMD
         static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
@@ -1158,8 +1158,8 @@ private:
         const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
         const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
 
-        for (;; p += 16, q += 16) {
-            const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
+        for (;; pages += 16, q += 16) {
+            const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(pages));
             const __m128i t1 = _mm_cmpeq_epi8(s, dq);
             const __m128i t2 = _mm_cmpeq_epi8(s, bs);
             const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x1F) == 0x1F
@@ -1174,27 +1174,27 @@ private:
 #else
                 length = static_cast<size_t>(__builtin_ffs(r) - 1);
 #endif
-                for (const char* pend = p + length; p != pend; )
-                    *q++ = *p++;
+                for (const char* pend = pages + length; pages != pend; )
+                    *q++ = *pages++;
                 break;
             }
             _mm_storeu_si128(reinterpret_cast<__m128i *>(q), s);
         }
 
-        is.src_ = p;
+        is.src_ = pages;
         is.dst_ = q;
     }
 
     // When read/write pointers are the same for insitu stream, just skip unescaped characters
     static RAPIDJSON_FORCEINLINE void SkipUnescapedString(InsituStringStream& is) {
         RAPIDJSON_ASSERT(is.src_ == is.dst_);
-        char* p = is.src_;
+        char* pages = is.src_;
 
-        // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
-        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
-        for (; p != nextAligned; p++)
-            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20)) {
-                is.src_ = is.dst_ = p;
+        // Scan one by one until alignment (unaligned load may cross pages boundary and cause crash)
+        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
+        for (; pages != nextAligned; pages++)
+            if (RAPIDJSON_UNLIKELY(*pages == '\"') || RAPIDJSON_UNLIKELY(*pages == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*pages) < 0x20)) {
+                is.src_ = is.dst_ = pages;
                 return;
             }
 
@@ -1206,8 +1206,8 @@ private:
         const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
         const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
 
-        for (;; p += 16) {
-            const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
+        for (;; pages += 16) {
+            const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(pages));
             const __m128i t1 = _mm_cmpeq_epi8(s, dq);
             const __m128i t2 = _mm_cmpeq_epi8(s, bs);
             const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x1F) == 0x1F
@@ -1222,27 +1222,27 @@ private:
 #else
                 length = static_cast<size_t>(__builtin_ffs(r) - 1);
 #endif
-                p += length;
+                pages += length;
                 break;
             }
         }
 
-        is.src_ = is.dst_ = p;
+        is.src_ = is.dst_ = pages;
     }
 #elif defined(RAPIDJSON_NEON)
     // StringStream -> StackStream<char>
     static RAPIDJSON_FORCEINLINE void ScanCopyUnescapedString(StringStream& is, StackStream<char>& os) {
-        const char* p = is.src_;
+        const char* pages = is.src_;
 
-        // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
-        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
-        while (p != nextAligned)
-            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20)) {
-                is.src_ = p;
+        // Scan one by one until alignment (unaligned load may cross pages boundary and cause crash)
+        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
+        while (pages != nextAligned)
+            if (RAPIDJSON_UNLIKELY(*pages == '\"') || RAPIDJSON_UNLIKELY(*pages == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*pages) < 0x20)) {
+                is.src_ = pages;
                 return;
             }
             else
-                os.Put(*p++);
+                os.Put(*pages++);
 
         // The rest of string using SIMD
         const uint8x16_t s0 = vmovq_n_u8('"');
@@ -1250,8 +1250,8 @@ private:
         const uint8x16_t s2 = vmovq_n_u8('\b');
         const uint8x16_t s3 = vmovq_n_u8(32);
 
-        for (;; p += 16) {
-            const uint8x16_t s = vld1q_u8(reinterpret_cast<const uint8_t *>(p));
+        for (;; pages += 16) {
+            const uint8x16_t s = vld1q_u8(reinterpret_cast<const uint8_t *>(pages));
             uint8x16_t x = vceqq_u8(s, s0);
             x = vorrq_u8(x, vceqq_u8(s, s1));
             x = vorrq_u8(x, vceqq_u8(s, s2));
@@ -1278,16 +1278,16 @@ private:
                 if (length != 0) {
                     char* q = reinterpret_cast<char*>(os.Push(length));
                     for (size_t i = 0; i < length; i++)
-                        q[i] = p[i];
+                        q[i] = pages[i];
 
-                    p += length;
+                    pages += length;
                 }
                 break;
             }
             vst1q_u8(reinterpret_cast<uint8_t *>(os.Push(16)), s);
         }
 
-        is.src_ = p;
+        is.src_ = pages;
     }
 
     // InsituStringStream -> InsituStringStream
@@ -1300,19 +1300,19 @@ private:
             return;
         }
 
-        char* p = is.src_;
+        char* pages = is.src_;
         char *q = is.dst_;
 
-        // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
-        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
-        while (p != nextAligned)
-            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20)) {
-                is.src_ = p;
+        // Scan one by one until alignment (unaligned load may cross pages boundary and cause crash)
+        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
+        while (pages != nextAligned)
+            if (RAPIDJSON_UNLIKELY(*pages == '\"') || RAPIDJSON_UNLIKELY(*pages == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*pages) < 0x20)) {
+                is.src_ = pages;
                 is.dst_ = q;
                 return;
             }
             else
-                *q++ = *p++;
+                *q++ = *pages++;
 
         // The rest of string using SIMD
         const uint8x16_t s0 = vmovq_n_u8('"');
@@ -1320,8 +1320,8 @@ private:
         const uint8x16_t s2 = vmovq_n_u8('\b');
         const uint8x16_t s3 = vmovq_n_u8(32);
 
-        for (;; p += 16, q += 16) {
-            const uint8x16_t s = vld1q_u8(reinterpret_cast<uint8_t *>(p));
+        for (;; pages += 16, q += 16) {
+            const uint8x16_t s = vld1q_u8(reinterpret_cast<uint8_t *>(pages));
             uint8x16_t x = vceqq_u8(s, s0);
             x = vorrq_u8(x, vceqq_u8(s, s1));
             x = vorrq_u8(x, vceqq_u8(s, s2));
@@ -1345,28 +1345,28 @@ private:
                 escaped = true;
             }
             if (RAPIDJSON_UNLIKELY(escaped)) {   // some of characters is escaped
-                for (const char* pend = p + length; p != pend; ) {
-                    *q++ = *p++;
+                for (const char* pend = pages + length; pages != pend; ) {
+                    *q++ = *pages++;
                 }
                 break;
             }
             vst1q_u8(reinterpret_cast<uint8_t *>(q), s);
         }
 
-        is.src_ = p;
+        is.src_ = pages;
         is.dst_ = q;
     }
 
     // When read/write pointers are the same for insitu stream, just skip unescaped characters
     static RAPIDJSON_FORCEINLINE void SkipUnescapedString(InsituStringStream& is) {
         RAPIDJSON_ASSERT(is.src_ == is.dst_);
-        char* p = is.src_;
+        char* pages = is.src_;
 
-        // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
-        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
-        for (; p != nextAligned; p++)
-            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20)) {
-                is.src_ = is.dst_ = p;
+        // Scan one by one until alignment (unaligned load may cross pages boundary and cause crash)
+        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
+        for (; pages != nextAligned; pages++)
+            if (RAPIDJSON_UNLIKELY(*pages == '\"') || RAPIDJSON_UNLIKELY(*pages == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*pages) < 0x20)) {
+                is.src_ = is.dst_ = pages;
                 return;
             }
 
@@ -1376,8 +1376,8 @@ private:
         const uint8x16_t s2 = vmovq_n_u8('\b');
         const uint8x16_t s3 = vmovq_n_u8(32);
 
-        for (;; p += 16) {
-            const uint8x16_t s = vld1q_u8(reinterpret_cast<uint8_t *>(p));
+        for (;; pages += 16) {
+            const uint8x16_t s = vld1q_u8(reinterpret_cast<uint8_t *>(pages));
             uint8x16_t x = vceqq_u8(s, s0);
             x = vorrq_u8(x, vceqq_u8(s, s1));
             x = vorrq_u8(x, vceqq_u8(s, s2));
@@ -1390,17 +1390,17 @@ private:
             if (low == 0) {
                 if (high != 0) {
                     uint32_t lz = internal::clzll(high);
-                    p += 8 + (lz >> 3);
+                    pages += 8 + (lz >> 3);
                     break;
                 }
             } else {
                 uint32_t lz = internal::clzll(low);
-                p += lz >> 3;
+                pages += lz >> 3;
                 break;
             }
         }
 
-        is.src_ = is.dst_ = p;
+        is.src_ = is.dst_ = pages;
     }
 #endif // RAPIDJSON_NEON
 

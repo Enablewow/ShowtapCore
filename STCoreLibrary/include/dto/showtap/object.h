@@ -9,6 +9,9 @@
 
 #include <dto/abs_json.h>
 #include <dto/showtap/enumerates.h>
+#include <dto/showtap/resource.h>
+#include <dto/showtap/effect.h>
+#include <dto/showtap/font.h>
 
 #include <extension/estring.h>
 #include <display.h>
@@ -24,12 +27,12 @@
 #define K_OBJECT_RESOURCE "resource"
 #define K_OBJECT_CHILDREN "childs"
 #define K_OBJECT_EFFECT "effect"
-#define K_OBJECT_OPTION "additionalOption"
+#define K_OBJECT_FONT "additionalOption"
 #define K_OBJECT_TYPE "showObjectType"
 
 
 namespace showtap {
-    class Object {
+    class Object : public BaseJson {
     protected:
         Type type;
         std::string tag = UString::UUID();
@@ -42,80 +45,106 @@ namespace showtap {
 
         float alpha = 0.0f;
 
-        std::vector<Object *> child;
+        std::vector<Object *> children;
+
+        Resource res;
+        Effect effect;
+        Font font;
 
     public:
         explicit Object(const Type _type = Type::None) : type(_type) {}
-        ~Object(){
-            child.clear();
-        }
 
         void setCommonAttributes(rapidjson::Value &value);
         void setChildAttrributes(rapidjson::Value &value);
 
-        virtual Object deserialize(rapidjson::Value &value) { return Object(); };
+        bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
+        bool deserialize(rapidjson::Value &value) override;
 
-        const char* toString(){
-            char buf[256];
+        std::string toString() const {
+            std::stringstream ss;
 
-            sprintf(buf, "Object: %s", tag.c_str());
+            ss << "Class: " << getClassName() << "\n";
+            ss << "Tag: " << tag << "\n";
+            ss << "Children: " << children.size() << " Child\n";
+            ss << "(";
 
-            return buf;
+            for(auto iter = children.begin(); iter < children.end(); iter++){
+                ss << (*iter)->getClassName();
+
+                if(children.end() - 1 != iter) ss << ", ";
+            }
+
+            ss << ")";
+
+            return ss.str();
         }
+
+        virtual std::string getClassName() const { return "Object"; }
+
+        ~Object(){ children.clear(); }
     };
 
     class Tapcon : public Object {
     public:
-        Tapcon() : Object(Type::Tapcon){}
-        Object deserialize(rapidjson::Value &value) override;
+        Tapcon() : Object(Type::Tapcon) {}
+
+        std::string getClassName() const override { return "Tapcon"; }
     };
 
     class Group : public Object {
     public:
         Group() : Object(Type::Group){}
-        Object deserialize(rapidjson::Value &value) override;
+
+        std::string getClassName() const override { return "Group"; }
     };
 
     class Image : public Object {
     public:
         Image() : Object(Type::Image){}
-        Object deserialize(rapidjson::Value &value) override;
+
+        std::string getClassName() const override { return "Image"; }
     };
 
     class Video : public Object {
     public:
         Video() : Object(Type::Video){}
-        Object deserialize(rapidjson::Value &value) override;
+
+        std::string getClassName() const override { return "Video"; }
     };
 
     class Audio : public Object {
     public:
         Audio() : Object(Type::Audio){}
-        Object deserialize(rapidjson::Value &value) override;
+
+        std::string getClassName() const override { return "Audio"; }
     };
 
     class Mark : public Object {
     public:
         Mark() : Object(Type::Mark){}
-        Object deserialize(rapidjson::Value &value) override;
+
+        std::string getClassName() const override { return "Mark"; }
     };
 
     class URL : public Object {
     public:
         URL() : Object(Type::URL){}
-        Object deserialize(rapidjson::Value &value) override;
+
+        std::string getClassName() const override { return "URL"; }
     };
 
     class Text : public Object {
     public:
         Text() : Object(Type::Text){}
-        Object deserialize(rapidjson::Value &value) override;
+
+        std::string getClassName() const override { return "Text"; }
     };
 
     class Slide : public Object {
     public:
         Slide() : Object(Type::Slide){}
-        Object deserialize(rapidjson::Value &value) override;
+
+        std::string getClassName() const override { return "Slide"; }
     };
 }
 

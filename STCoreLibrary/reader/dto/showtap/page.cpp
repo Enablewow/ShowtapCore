@@ -7,7 +7,6 @@
 using namespace showtap;
 
 bool Page::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
-
     writer->StartObject();
 
     writer->String(K_PAGE_ID);
@@ -15,6 +14,9 @@ bool Page::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
 
     writer->String(K_PAGE_HIDDEN);
     writer->Bool(isHidden);
+
+    writer->String(K_PAGE_RESOURCE);
+    background.serialize(writer);
 
     writer->EndObject();
 
@@ -25,18 +27,26 @@ bool Page::deserialize(rapidjson::Value &value) {
     id = value[K_PAGE_ID].GetInt64();
     isHidden = value[K_PAGE_HIDDEN].GetBool();
 
-    Resource r;
-    r.deserialize(value[K_PAGE_RESOURCE]);
+    background.deserialize(value[K_PAGE_RESOURCE]);
 
-    background = r;
+    auto _objs = &value[K_PAGE_OBJECT];
+    if(_objs->IsNull()) return true;
 
-    auto arr = value[K_PAGE_OBJECT].GetArray();
-    Object *temp;
+    auto arr = _objs->GetArray();
+
     for(auto iter = arr.begin(); iter < arr.end(); iter++){
-        temp = new Tapcon();
-        temp->deserialize(*iter);
+        Object *tapcon;
 
-        children.push_back(temp);
+        Type type = Type((*iter)[K_OBJECT_TYPE].GetInt());
+
+        switch(type){
+            case Type::Tapcon: tapcon = new Tapcon; break;
+            case Type::Group: tapcon = new Group; break;
+            default: continue;
+        }
+
+        tapcon->deserialize(*iter);
+        children.push_back(tapcon);
     }
 
     return true;

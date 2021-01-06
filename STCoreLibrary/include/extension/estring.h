@@ -131,7 +131,7 @@ public:
     static int hexToIntColor(std::string const &str){
         if(!startsWith(str, "#")) return 0;
 
-        return std::stoi(str.substr(1, str.size() - 1));
+        return (int)std::strtol(str.substr(1, str.size() - 1).c_str(), nullptr, 16);
     }
 
     static int hexToIntColor(const char *str){
@@ -218,9 +218,22 @@ public:
 
     static bool replace(std::string &statement, std::string const &src, std::string const &replacement){
         size_t f = statement.find(src);
-        size_t r = f + src.length();
 
-        statement.replace(f, r, replacement);
+        statement.replace(f, src.length(), replacement);
+        statement.shrink_to_fit();
+
+        return true;
+    }
+
+    static bool replaceAll(std::string &statement, std::string const &src, std::string const &replacement){
+        size_t start_pos = 0;
+
+        while((start_pos = statement.find(src, start_pos)) != std::string::npos) {
+            statement.replace(start_pos, src.length(), replacement);
+            start_pos += replacement.length(); // Handles case where 'to' is a substring of 'from'
+        }
+
+        statement.shrink_to_fit();
 
         return true;
     }

@@ -36,7 +36,7 @@ inline double FastPath(double significand, int exp) {
 
 inline double StrtodNormalPrecision(double d, int p) {
     if (p < -308) {
-        // Prevent expSum < -308, making Pow10(p) = 0
+        // Prevent expSum < -308, making Pow10(pages) = 0
         d = FastPath(d, -308);
         d = FastPath(d, p + 308);
     }

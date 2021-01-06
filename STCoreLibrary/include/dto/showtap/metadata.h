@@ -49,20 +49,35 @@ namespace showtap {
             int size = 0;
         } pointer;
 
-        std::vector<Page> p;
+        std::vector<Page *> pages;
 
-        int background = 0xffffff;
+        int background = -1;
 
     public:
         bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
         bool deserialize(rapidjson::Value &value) override;
 
         std::string getFilename() const { return name; }
-        std::vector<Page> getPages() const { return p; }
+        std::vector<Page *> getPages() const { return pages; }
 
         double getFileRatio() const { return ratio; }
 
         int findIndexById(long id) const;
+
+        std::string toString() const {
+            std::stringstream ss;
+            ss << "------ Metadata Info ------\n";
+            ss << "File: " << name << "\n";
+            ss << "Path: " << path << "\n";
+            ss << "Page: " << pages.size() << " Pages\n";
+            ss << "-------------\n";
+
+            return ss.str();
+        }
+
+        ~Metadata(){
+            pages.clear();
+        }
     };
 }
 

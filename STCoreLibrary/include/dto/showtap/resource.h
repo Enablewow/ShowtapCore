@@ -21,9 +21,9 @@
 #define K_RESOURCE_FULL_NAME "fileFullName"
 
 // ---- Not Use ---- //
-//#define K_RESOURCE_LINKED "isLinkConnect"
-//#define K_RESOURCE_EXTENSION "fileExtension"
-//#define K_RESOURCE_URL "resourceURL"
+#define K_RESOURCE_LINKED "isLinkConnect"
+#define K_RESOURCE_EXTENSION "fileExtension"
+#define K_RESOURCE_URL "resourceURL"
 // ----------------- //
 namespace showtap {
     class Resource : public BaseJson {
@@ -33,15 +33,16 @@ namespace showtap {
         std::string name;
         std::string nameWithoutExtension;
         std::string text;
+        std::string extension;
+        std::string url;
+
 
         Ref ref = Ref::None;
         File type = File::Folder;
 
         int pdfPage = -1;
 
-        //std::string extension;
-        //std::string url;
-        //bool hasLink = false;
+        bool hasLink = false;
     public:
         static const char* directory(Resource &res){
             return "";

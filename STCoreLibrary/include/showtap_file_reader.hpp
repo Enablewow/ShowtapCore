@@ -17,13 +17,13 @@
 #include <logger.h>
 
 #include <rapidjson/document.h>
-#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/prettywriter.h>
 
 #include <extension/efile.h>
 #include <extension/estring.h>
 
 #include <dto/thumbnail_info.h>
-//#include <dto/showtap/metadata.h>
+#include <dto/showtap/metadata.h>
 
 using namespace std;
 using namespace macaron;
@@ -36,6 +36,8 @@ private:
 
     string dest;
     string path_metadata;
+
+    showtap::Metadata metadata;
 
     map<string, string> renameMap;
 

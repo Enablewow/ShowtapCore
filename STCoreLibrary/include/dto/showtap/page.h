@@ -44,6 +44,27 @@ namespace showtap {
 
         int getChildrenSize() const { return children.size(); }
         std::vector<Object *> getChildren() const { return children; }
+
+        std::string toString() const {
+            std::stringstream ss;
+
+            ss << "---- Page Info ----\n";
+            ss << "Id: " << id << "\n";
+            ss << "Children: " << children.size() << "\n";
+
+            ss << "(";
+            for (auto iter = children.begin(); iter < children.end(); iter++){
+                ss << (*iter)->getClassName();
+
+                if(children.end() - 1 != iter){
+                    ss << ", ";
+                }
+            }
+
+            ss << ")";
+
+            return ss.str();
+        };
     };
 }
 

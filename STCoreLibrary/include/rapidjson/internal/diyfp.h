@@ -77,9 +77,9 @@ struct DiyFp {
         return DiyFp(h, e + rhs.e + 64);
 #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__x86_64__)
         __extension__ typedef unsigned __int128 uint128;
-        uint128 p = static_cast<uint128>(f) * static_cast<uint128>(rhs.f);
-        uint64_t h = static_cast<uint64_t>(p >> 64);
-        uint64_t l = static_cast<uint64_t>(p);
+        uint128 pages = static_cast<uint128>(f) * static_cast<uint128>(rhs.f);
+        uint64_t h = static_cast<uint64_t>(pages >> 64);
+        uint64_t l = static_cast<uint64_t>(pages);
         if (l & (uint64_t(1) << 63)) // rounding
             h++;
         return DiyFp(h, e + rhs.e + 64);

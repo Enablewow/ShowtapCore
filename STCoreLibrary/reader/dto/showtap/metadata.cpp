@@ -13,7 +13,7 @@ bool Metadata::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) con
     writer->Int(version);
 
     writer->String(K_META_OS);
-    writer->String(reinterpret_cast<const char *const>(os));
+    writer->String(std::string(1, os).c_str());
 
     writer->String(K_META_RATIO);
     writer->Double(ratio);
@@ -36,16 +36,17 @@ bool Metadata::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) con
     writer->String(K_META_POINTER_SIZE);
     writer->Int(pointer.size);
 
-
     writer->String(K_META_BACKGROUND);
-    writer->String(UString::intToHexCode(background).c_str());
+    background == -1 ? writer->Null() : writer->String(UString::intToHexCode(background).c_str());
 
-    /*
     writer->String(K_META_PAGES);
     writer->StartArray();
 
+    for (auto &page : pages){
+        page->serialize(writer);
+    }
+
     writer->EndArray();
-    */
 
     writer->EndObject();
 
@@ -66,14 +67,14 @@ bool Metadata::deserialize(rapidjson::Value &value) {
     pointer.size = value[K_META_POINTER_SIZE].GetInt();
 
     for(auto &a : value[K_META_PAGES].GetArray()){
-        Page _p;
+        Page *_p = new Page;
 
-        _p.deserialize(a);
+        _p->deserialize(a);
 
-        p.push_back(_p);
+        pages.push_back(_p);
     }
 
-    background = !value[K_META_BACKGROUND].IsNull() ? UString::hexToIntColor(value[K_META_BACKGROUND].GetString()) : 0x000000;
+    background = !value[K_META_BACKGROUND].IsNull() ? UString::hexToIntColor(value[K_META_BACKGROUND].GetString()) : -1;
 
     return true;
 }
@@ -81,9 +82,9 @@ bool Metadata::deserialize(rapidjson::Value &value) {
 int Metadata::findIndexById(long id) const {
     int ret = -1, i = 0;
 
-    for(auto iter = p.begin(); iter < p.end(); iter++, i++){
-        if(iter->getPageId() == id){
-            ret = iter->getPageId();
+    for(auto iter = pages.begin(); iter < pages.end(); iter++, i++){
+        if((*iter)->getPageId() == id){
+            ret = (*iter)->getPageId();
 
             break;
         }

@@ -14,6 +14,16 @@ int FileReader::extract(){
     extractBinaryThumbnail();
     extractBinaryResources();
 
+    StringBuffer jb;
+    PrettyWriter<StringBuffer> writer(jb);
+
+    metadata.serialize(&writer);
+    string json = jb.GetString();
+
+    ofstream cpy(dest + "/copy.info");
+    cpy << jb.GetString();
+    cpy.close();
+
     remappingChangedFile();
 
     return RESULT_OK;
@@ -60,7 +70,7 @@ void FileReader::extractBinaryResources() {
 
         // 파일 Binary 를 가져온다.
         long fsize = readSize();
-        Log::print("Extract file: %s (ns: %d) size: %d", fpath.c_str(), nsize, fsize);
+        //Log::print("Extract file: %s (ns: %d) size: %d", fpath.c_str(), nsize, fsize);
 
         bool _exist = UFile::exist(fdest.c_str());
 
@@ -80,14 +90,20 @@ void FileReader::extractBinaryResources() {
         if(osize > 0 && osize == fsize) { // 같은 정보의 데이터라면 저장을 스킵한다.
             stream.seekg(fsize, ios::cur);
 
-            if(UString::endsWith(fpath, F_EXT_METADATA))
-                path_metadata = fdest;
+            if(UString::endsWith(fpath, F_EXT_METADATA)){
+                stringstream ss;
+                ss << fos.rdbuf();
 
+                metadata.import(ss.str());
+
+                path_metadata = fdest;
+            }
         }else{
             if(UString::endsWith(fpath, F_EXT_METADATA)){
                 string metadatas = readString(fsize);
 
                 fos.write(metadatas.c_str(), metadatas.size());
+                metadata.import(metadatas);
 
                 path_metadata = fdest;
             }else{
@@ -170,5 +186,21 @@ string FileReader::readString(long size, bool decodeBase64) {
 void FileReader::remappingChangedFile() {
     if (renameMap.empty()) return;
 
+    /*
+    ifstream mstream(path_metadata, ios_base::binary);
+    stringstream ss;
 
+    ss << mstream.rdbuf();
+    mstream.close();
+
+    string json = ss.str();
+
+    for (auto &kv : renameMap){
+        UString::replaceAll(json, kv.first, kv.second);
+    }
+
+    ofstream out(path_metadata);
+    out.write(json.c_str(), json.length());
+    out.close();
+    */
 }

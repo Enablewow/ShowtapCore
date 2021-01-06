@@ -579,20 +579,20 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
     if (!RAPIDJSON_LIKELY(is.Tell() < length))
         return false;
 
-    const char* p = is.src_;
+    const char* pages = is.src_;
     const char* end = is.head_ + length;
-    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
     const char* endAligned = reinterpret_cast<const char*>(reinterpret_cast<size_t>(end) & static_cast<size_t>(~15));
     if (nextAligned > end)
         return true;
 
-    while (p != nextAligned)
-        if (*p < 0x20 || *p == '\"' || *p == '\\') {
-            is.src_ = p;
+    while (pages != nextAligned)
+        if (*pages < 0x20 || *pages == '\"' || *pages == '\\') {
+            is.src_ = pages;
             return RAPIDJSON_LIKELY(is.Tell() < length);
         }
         else
-            os_->PutUnsafe(*p++);
+            os_->PutUnsafe(*pages++);
 
     // The rest of string using SIMD
     static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
@@ -602,8 +602,8 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
     const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
     const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
 
-    for (; p != endAligned; p += 16) {
-        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
+    for (; pages != endAligned; pages += 16) {
+        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(pages));
         const __m128i t1 = _mm_cmpeq_epi8(s, dq);
         const __m128i t2 = _mm_cmpeq_epi8(s, bs);
         const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x1F) == 0x1F
@@ -620,15 +620,15 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
 #endif
             char* q = reinterpret_cast<char*>(os_->PushUnsafe(len));
             for (size_t i = 0; i < len; i++)
-                q[i] = p[i];
+                q[i] = pages[i];
 
-            p += len;
+            pages += len;
             break;
         }
         _mm_storeu_si128(reinterpret_cast<__m128i *>(os_->PushUnsafe(16)), s);
     }
 
-    is.src_ = p;
+    is.src_ = pages;
     return RAPIDJSON_LIKELY(is.Tell() < length);
 }
 #elif defined(RAPIDJSON_NEON)
@@ -640,20 +640,20 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
     if (!RAPIDJSON_LIKELY(is.Tell() < length))
         return false;
 
-    const char* p = is.src_;
+    const char* pages = is.src_;
     const char* end = is.head_ + length;
-    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(pages) + 15) & static_cast<size_t>(~15));
     const char* endAligned = reinterpret_cast<const char*>(reinterpret_cast<size_t>(end) & static_cast<size_t>(~15));
     if (nextAligned > end)
         return true;
 
-    while (p != nextAligned)
-        if (*p < 0x20 || *p == '\"' || *p == '\\') {
-            is.src_ = p;
+    while (pages != nextAligned)
+        if (*pages < 0x20 || *pages == '\"' || *pages == '\\') {
+            is.src_ = pages;
             return RAPIDJSON_LIKELY(is.Tell() < length);
         }
         else
-            os_->PutUnsafe(*p++);
+            os_->PutUnsafe(*pages++);
 
     // The rest of string using SIMD
     const uint8x16_t s0 = vmovq_n_u8('"');
@@ -661,8 +661,8 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
     const uint8x16_t s2 = vmovq_n_u8('\b');
     const uint8x16_t s3 = vmovq_n_u8(32);
 
-    for (; p != endAligned; p += 16) {
-        const uint8x16_t s = vld1q_u8(reinterpret_cast<const uint8_t *>(p));
+    for (; pages != endAligned; pages += 16) {
+        const uint8x16_t s = vld1q_u8(reinterpret_cast<const uint8_t *>(pages));
         uint8x16_t x = vceqq_u8(s, s0);
         x = vorrq_u8(x, vceqq_u8(s, s1));
         x = vorrq_u8(x, vceqq_u8(s, s2));
@@ -688,15 +688,15 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
         if (RAPIDJSON_UNLIKELY(escaped)) {   // some of characters is escaped
             char* q = reinterpret_cast<char*>(os_->PushUnsafe(len));
             for (size_t i = 0; i < len; i++)
-                q[i] = p[i];
+                q[i] = pages[i];
 
-            p += len;
+            pages += len;
             break;
         }
         vst1q_u8(reinterpret_cast<uint8_t *>(os_->PushUnsafe(16)), s);
     }
 
-    is.src_ = p;
+    is.src_ = pages;
     return RAPIDJSON_LIKELY(is.Tell() < length);
 }
 #endif // RAPIDJSON_NEON

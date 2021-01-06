@@ -254,10 +254,10 @@ private:
         return low;
 #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__x86_64__)
         __extension__ typedef unsigned __int128 uint128;
-        uint128 p = static_cast<uint128>(a) * static_cast<uint128>(b);
-        p += k;
-        *outHigh = static_cast<uint64_t>(p >> 64);
-        return static_cast<uint64_t>(p);
+        uint128 page = static_cast<uint128>(a) * static_cast<uint128>(b);
+        pages += k;
+        *outHigh = static_cast<uint64_t>(pages >> 64);
+        return static_cast<uint64_t>(pages);
 #else
         const uint64_t a0 = a & 0xFFFFFFFF, a1 = a >> 32, b0 = b & 0xFFFFFFFF, b1 = b >> 32;
         uint64_t x0 = a0 * b0, x1 = a0 * b1, x2 = a1 * b0, x3 = a1 * b1;

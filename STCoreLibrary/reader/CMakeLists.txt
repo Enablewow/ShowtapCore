@@ -7,7 +7,10 @@ set(_DTO
         dto/showtap/object.cpp
         dto/thumbnail_info.cpp
         dto/showtap/metadata.cpp
-        dto/showtap/page.cpp dto/showtap/resource.cpp)
+        dto/showtap/page.cpp
+        dto/showtap/resource.cpp
+        dto/showtap/effect.cpp
+        dto/showtap/font.cpp)
 
 add_library(stap_reader SHARED
         showtap_file_reader.cpp
