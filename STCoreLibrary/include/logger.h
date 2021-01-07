@@ -5,7 +5,7 @@
 #ifndef SHOWTAP_LIBRARY_LOGGER_H
 #define SHOWTAP_LIBRARY_LOGGER_H
 
-#define LOG_BUF 1024
+#define LOG_BUF 1024 * 4
 #define LOG_TAG "CoreLibrary"
 
 class Log {

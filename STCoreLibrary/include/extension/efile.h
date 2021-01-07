@@ -9,6 +9,7 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+
 #include <regex>
 
 #include <extension/estring.h>
@@ -33,108 +34,36 @@ public :
      * @param removeExtension 확장자를 포함할지 안할 지. 기본 값은 false 이다.
      * @return 파일 명
      */
-    static std::string getFilenameFromPath(std::string const &path, bool removeExtension = false){
-        std::string split = path.substr(path.find_last_of("/\\") + 1);
-        if(!removeExtension)
-            return split;
-
-        split = split.replace(split.find_last_of('.'), split.size(), "");
-
-        return split;
-    }
-
-    static std::string getExtension(std::string const &name) {
-        std::smatch matched;
-        std::regex_search(name, matched, std::regex("\\.([a-zA-Z0-4]+)$"));
-
-        return matched[1].str();
-    }
-
-    static std::string shortenFilename(std::string const &name) {
-        if(name.length() < F_MAX_LENGTH_FILENAME) return name;
-
-        std::string newName = UString::utf8_substr(name, 0, 20);
-        std::string ext = getExtension(name);
-
-        newName += "_1";
-        newName += "." + ext;
-
-        return newName;
-    }
+    static std::string getFilenameFromPath(std::string const &path, bool removeExtension = false);
+    static std::string getExtension(std::string const &name);
+    static std::string shortenFilename(std::string const &name);
 
     /**
      * Temp Directory 경로 문자열을 가져온다.
-     * Root Directory 는 contstant 헤더에 있는 값에 따라 달라진다.
      *
      * @return
      */
-    static std::string getTemporaryDirectory(){
-        return std::string(::root) + "/temp";
-    }
+    static std::string getTemporaryDirectory(const std::string &r);
 
     /**
      * Temp Directory 에서 해당 쇼탭 파일의 리소스가 풀린 경로 문자열을 가져온다.
-     * Root Directory 는 contstant 헤더에 있는 값에 따라 달라진다.
      *
      * @return
      */
-    static std::string getTemporaryStapDirectory(std::string const &filename){
-        return getTemporaryDirectory() + "/" + filename;
-    }
+    static std::string getTemporaryStapDirectory(const std::string &r, const std::string &filename);
 
     /**
      * 기준 폴더의 하위 폴더를 생성한다.
      * 폴더의 기본 Root Directory 는 constant 헤더에 있는 값에 따라 달라지며, 다른 directory 로도 설정이 가능하다.
      *
      * @param path 생성되는 폴더 경로
-     * @param r 기준 Root Directory
      *
      * @return
      */
-    static bool makeDirectory(std::string const &path, std::string const &r = std::string(::root)){
-        std::string _path = path;
-        std::string _rel = _path.replace(0, r.length(), "");
+    static bool makeDirectory(std::string const &path, std::string const &r);
 
-        bool matched = std::regex_search(_rel, REGEX_EXTENSION);
-        std::vector<std::string> v = UString::split(_rel, '/');
-        if(matched)
-            v.erase(v.end() - 1);
-
-        std::string dir = r;
-
-        for(auto iter = v.begin(); iter < v.end() ; iter++){
-            if(iter->empty()) continue;
-
-            dir += "/" + *iter;
-            const char *_dir = dir.c_str();
-
-            if(!existDirectory(_dir)) {
-                if(mkdir(_dir, F_DIR_PERMISSION) == 0){
-                    chmod(_dir, F_DIR_PERMISSION);
-                }
-            }
-        }
-
-        return true;
-    }
-
-    static bool exist(const char *path){
-        struct stat info{};
-
-        return stat(path, &info) == 0;
-    }
-
-    static bool existDirectory(const char *path){
-        struct stat info{};
-
-        if(stat(path, &info) == -1)
-            return false;
-
-        switch(info.st_mode & S_IFMT){
-            case S_IFDIR: case S_IFREG : return true;
-            default: return true;
-        }
-    }
+    static bool exist(const char *path);
+    static bool existDirectory(const char *path);
 };
 
 #endif //SHOWTAP_CORE_LIBRARY_EFILE_H

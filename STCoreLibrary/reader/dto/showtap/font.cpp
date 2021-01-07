@@ -30,6 +30,7 @@ bool Font::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     writer->String(K_FONT_BACKGROUND);
     background == -1 ? writer->Null() : writer->String(UString::intToHexCode(background).c_str());
 
+    writer->String(K_FONT_INFO);
     info.serialize(writer);
 
     writer->EndObject();

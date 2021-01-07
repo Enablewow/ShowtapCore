@@ -92,3 +92,17 @@ int Metadata::findIndexById(long id) const {
 
     return ret;
 }
+
+void Metadata::changeMediaResource(const std::string &orig, const std::string &change) {
+    for(auto &p : pages){
+        if(p->getMediaName() == UFile::getFilenameFromPath(orig)){
+            p->setMediaFile(change);
+        }
+
+        if(p->getChildrenSize() > 0){
+            for(auto &child : p->getChildren()){
+                child->changeMediaResource(orig, change);
+            }
+        }
+    }
+}

@@ -8,6 +8,52 @@ using namespace showtap;
 
 bool Object::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
 
+    writer->StartObject();
+
+    writer->String(K_OBJECT_POSITION_X);
+    writer->Double(x);
+
+    writer->String(K_OBJECT_POSITION_Y);
+    writer->Double(y);
+
+    writer->String(K_OBJECT_WIDTH);
+    writer->Double(width);
+
+    writer->String(K_OBJECT_HEIGHT);
+    writer->Double(height);
+
+    writer->String(K_OBJECT_HIDDEN);
+    writer->Bool(isHidden);
+
+    writer->String(K_OBJECT_ON);
+    writer->Bool(isOn);
+
+    writer->String(K_OBJECT_ALPHA);
+    writer->Double(alpha);
+
+    writer->String(K_OBJECT_RESOURCE);
+    res == nullptr ? writer->Null() : res->serialize(writer);
+
+    writer->String(K_OBJECT_EFFECT);
+    effect.serialize(writer);
+
+    writer->String(K_OBJECT_FONT);
+    font == nullptr ? writer->Null() : font->serialize(writer);
+
+    writer->String(K_OBJECT_CHILDREN);
+    if(children.empty()) writer->Null();
+    else{
+        writer->StartArray();
+
+        for(auto &o : children){
+            o->serialize(writer);
+        }
+
+        writer->EndArray();
+    }
+
+    writer->EndObject();
+
     return true;
 }
 
@@ -32,15 +78,19 @@ void Object::setCommonAttributes(rapidjson::Value &value) {
 
     alpha = value[K_OBJECT_ALPHA].GetFloat();
 
-    if(!value[K_OBJECT_RESOURCE].IsNull()){
-        Resource r;
-        r.deserialize(value[K_OBJECT_RESOURCE]);
+    effect.deserialize(value[K_OBJECT_EFFECT]);
 
-        res = r;
+    if(!value[K_OBJECT_FONT].IsNull()){
+        font = new Font;
+
+        font->deserialize(value[K_OBJECT_FONT]);
     }
 
-    effect.deserialize(value[K_OBJECT_EFFECT]);
-    font.deserialize(value[K_OBJECT_FONT]);
+    if(!value[K_OBJECT_RESOURCE].IsNull()){
+        res = new Resource;
+
+        res->deserialize(value[K_OBJECT_RESOURCE]);
+    }
 }
 
 void Object::setChildAttrributes(rapidjson::Value &value) {
@@ -69,3 +119,27 @@ void Object::setChildAttrributes(rapidjson::Value &value) {
         children.push_back(c);
     }
 }
+
+void Object::traversingChangeMediaResource(Object *o, const std::string& orig, const std::string& change) {
+
+    if(dynamic_cast<IMedia *>(o) != nullptr){
+        auto media = dynamic_cast<IMedia *>(o);
+
+        Log::print("Compare: %s %s", UFile::getFilenameFromPath(orig).c_str(), media->getMediaName().c_str());
+
+        if(media->getMediaName() == UFile::getFilenameFromPath(orig))
+            media->setMediaFile(change);
+    }
+
+    if(children.empty()) return;
+
+    for(auto &child : o->children){
+        traversingChangeMediaResource(child, orig, change);
+    }
+}
+
+void Object::changeMediaResource(const std::string &orig, const std::string &change) {
+    traversingChangeMediaResource(this, orig, change);
+}
+
+

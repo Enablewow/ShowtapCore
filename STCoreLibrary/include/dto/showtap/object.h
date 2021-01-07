@@ -5,6 +5,7 @@
 #ifndef SHOWTAP_CORE_LIBRARY_SHOWTAP_OBJECT_H
 #define SHOWTAP_CORE_LIBRARY_SHOWTAP_OBJECT_H
 
+#include <iostream>
 #include <vector>
 
 #include <dto/abs_json.h>
@@ -13,7 +14,8 @@
 #include <dto/showtap/effect.h>
 #include <dto/showtap/font.h>
 
-#include <extension/estring.h>
+#include <dto/showtap/intf/imedia.h>
+
 #include <display.h>
 #include <logger.h>
 
@@ -32,7 +34,10 @@
 
 
 namespace showtap {
+
     class Object : public BaseJson {
+        void traversingChangeMediaResource(Object *o, const std::string& orig, const std::string& change);
+
     protected:
         Type type;
         std::string tag = UString::UUID();
@@ -47,18 +52,21 @@ namespace showtap {
 
         std::vector<Object *> children;
 
-        Resource res;
+        Resource *res = nullptr;
+        Font *font = nullptr;
         Effect effect;
-        Font font;
 
     public:
         explicit Object(const Type _type = Type::None) : type(_type) {}
 
         void setCommonAttributes(rapidjson::Value &value);
         void setChildAttrributes(rapidjson::Value &value);
+        void changeMediaResource(const std::string &orig, const std::string &change);
 
         bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
         bool deserialize(rapidjson::Value &value) override;
+
+        std::string getTag() const { return tag; }
 
         std::string toString() const {
             std::stringstream ss;
@@ -98,25 +106,34 @@ namespace showtap {
         std::string getClassName() const override { return "Group"; }
     };
 
-    class Image : public Object {
+    class Image : public Object, public IMedia {
     public:
         Image() : Object(Type::Image){}
 
         std::string getClassName() const override { return "Image"; }
+
+        void setMediaFile(std::string path) override { res->setResourceFile(path); }
+        std::string getMediaName() const override { return res->getResourceFileName(); }
     };
 
-    class Video : public Object {
+    class Video : public Object, public IMedia {
     public:
         Video() : Object(Type::Video){}
 
         std::string getClassName() const override { return "Video"; }
+
+        void setMediaFile(std::string path) override { res->setResourceFile(path); }
+        std::string getMediaName() const override { return res->getResourceFileName(); }
     };
 
-    class Audio : public Object {
+    class Audio : public Object, public IMedia {
     public:
         Audio() : Object(Type::Audio){}
 
         std::string getClassName() const override { return "Audio"; }
+
+        void setMediaFile(std::string path) override { res->setResourceFile(path); }
+        std::string getMediaName() const override { return res->getResourceFileName(); }
     };
 
     class Mark : public Object {

@@ -12,16 +12,8 @@ namespace showtap {
     struct RECT {
         int left = 0, right = 0, top = 0, bottom = 0;
 
-        void getWidth() const { right - left; }
-        void getHeight() const { bottom - top; }
-
-        const char* toString() const {
-            char buf[256];
-
-            sprintf(buf, "left: %d top: %d right: %d bottom: %d", left, top, right, bottom);
-
-            return buf;
-        }
+        int getWidth() const { return right - left; }
+        int getHeight() const { return bottom - top; }
     };
 
     struct Ratio { double R4_3 = 4/(double)3, R16_9 = 16/(double)9; };

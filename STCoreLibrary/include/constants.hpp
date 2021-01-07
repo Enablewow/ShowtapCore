@@ -9,6 +9,7 @@
 #define constants_hpp
 
 #include <iostream>
+
 #include <errors.hpp>
 #include <globals.h>
 

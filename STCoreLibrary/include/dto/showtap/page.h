@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <dto/abs_json.h>
+
 #include <dto/showtap/enumerates.h>
 #include <dto/showtap/resource.h>
 #include <dto/showtap/object.h>
@@ -27,7 +28,7 @@
 // --------------- //
 
 namespace showtap {
-    class Page : public BaseJson {
+    class Page : public BaseJson, IMedia {
         int64_t id = -1;
 
         bool isHidden = false;
@@ -65,6 +66,16 @@ namespace showtap {
 
             return ss.str();
         };
+
+        void setMediaFile(std::string path) override {
+            if(getBackgroundType() == Background::Color) return;
+
+            background.setResourceFile(path);
+        }
+
+        std::string getMediaName() const override {
+            return getBackgroundType() == Background::Color ? background.getResourceText() :background.getResourceFileName();
+        }
     };
 }
 

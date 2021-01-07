@@ -11,6 +11,7 @@
 #include <dto/showtap/page.h>
 
 #include <extension/estring.h>
+#include <extension/efile.h>
 
 #define K_META_OS "os"
 #define K_META_VERSION "version"
@@ -63,6 +64,7 @@ namespace showtap {
         double getFileRatio() const { return ratio; }
 
         int findIndexById(long id) const;
+        void changeMediaResource(const std::string &orig, const std::string &change);
 
         std::string toString() const {
             std::stringstream ss;

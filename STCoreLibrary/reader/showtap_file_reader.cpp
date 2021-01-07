@@ -14,17 +14,7 @@ int FileReader::extract(){
     extractBinaryThumbnail();
     extractBinaryResources();
 
-    StringBuffer jb;
-    PrettyWriter<StringBuffer> writer(jb);
-
-    metadata.serialize(&writer);
-    string json = jb.GetString();
-
-    ofstream cpy(dest + "/copy.info");
-    cpy << jb.GetString();
-    cpy.close();
-
-    remappingChangedFile();
+    //remappingChangedFile();
 
     return RESULT_OK;
 }
@@ -33,7 +23,7 @@ void FileReader::extractBinaryThumbnail() {
     long size = readSize();
     string json = readString(size);
 
-    ThumbnailInfo th;
+    showtap::ThumbnailInfo th;
     th.import(json);
 }
 
@@ -66,7 +56,7 @@ void FileReader::extractBinaryResources() {
 
         // 파일의 폴더가 없으면 폴더를 만들어 준다.
         if(!UFile::existDirectory(fdest.c_str()))
-            UFile::makeDirectory(fdest);
+            UFile::makeDirectory(fdest, root);
 
         // 파일 Binary 를 가져온다.
         long fsize = readSize();
@@ -131,7 +121,7 @@ void FileReader::extractBinaryResources() {
 }
 
 long FileReader::readSize() {
-    char *buf = new char[sizeof(long)];
+    auto *buf = new char[sizeof(long)];
     stream.read(buf, sizeof buf);
 
     long size =
@@ -140,7 +130,7 @@ long FileReader::readSize() {
             (buf[1] << 8) |
             (buf[0]);
 
-    //Log::print("Buffer Size: %d Word: %s real size: %d", sizeof buf, buf, size);
+    //Log::print("Buffer Size: %d Word: %s real size: %ld", sizeof buf, &buf, size);
 
     delete[] buf;
 
@@ -177,8 +167,10 @@ string FileReader::readString(long size, bool decodeBase64) {
 
     if(!decodeBase64) return result;
 
-    string decode;
+    string decode = UString::base64_decode(result);
     Base64::Decode(result, decode);
+
+    Log::print("Read String: %s", decode.c_str());
 
     return decode;
 }
@@ -186,21 +178,19 @@ string FileReader::readString(long size, bool decodeBase64) {
 void FileReader::remappingChangedFile() {
     if (renameMap.empty()) return;
 
-    /*
-    ifstream mstream(path_metadata, ios_base::binary);
-    stringstream ss;
-
-    ss << mstream.rdbuf();
-    mstream.close();
-
-    string json = ss.str();
-
-    for (auto &kv : renameMap){
-        UString::replaceAll(json, kv.first, kv.second);
+    for(auto &kv : renameMap){
+        metadata.changeMediaResource(kv.first, kv.second);
     }
 
-    ofstream out(path_metadata);
-    out.write(json.c_str(), json.length());
-    out.close();
+    /*
+    StringBuffer jb;
+    Writer<StringBuffer> writer(jb);
+
+    metadata.serialize(&writer);
+    string json = jb.GetString();
+
+    ofstream cpy(dest + "/copy.info");
+    cpy << jb.GetString();
+    cpy.close();
     */
 }

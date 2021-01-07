@@ -8,6 +8,9 @@
 #include <dto/abs_json.h>
 #include <dto/showtap/enumerates.h>
 
+#include <extension/estring.h>
+#include <extension/efile.h>
+
 #include <logger.h>
 
 #define K_RESOURCE_ABSOLUTE_PATH "fileUrlPath"
@@ -36,7 +39,6 @@ namespace showtap {
         std::string extension;
         std::string url;
 
-
         Ref ref = Ref::None;
         File type = File::Folder;
 
@@ -44,15 +46,28 @@ namespace showtap {
 
         bool hasLink = false;
     public:
-        static const char* directory(Resource &res){
-            return "";
+        File getType() const { return type; }
+        void setResourceFile(std::string const &path){
+            UString::replace(absolutePath, relativePath, path);
+
+            relativePath = path;
+            url = absolutePath;
+
+            name = UFile::getFilenameFromPath(path);
+            nameWithoutExtension = UFile::getFilenameFromPath(path, true);
+
+            extension = UFile::getExtension(name);
+
+            Log::print("Changed: %s", name.c_str());
         }
 
-        File getType() const { return type; }
+        std::string getResourceText() const { return text; }
+        std::string getResourceFileName() const { return name; }
 
         bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
         bool deserialize(rapidjson::Value &value) override;
     };
+
 }
 
 #endif //SHOWTAP_LIBRARY_RESOURCE_H

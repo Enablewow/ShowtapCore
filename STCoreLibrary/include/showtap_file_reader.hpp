@@ -17,10 +17,8 @@
 #include <logger.h>
 
 #include <rapidjson/document.h>
-#include <rapidjson/prettywriter.h>
 
 #include <extension/efile.h>
-#include <extension/estring.h>
 
 #include <dto/thumbnail_info.h>
 #include <dto/showtap/metadata.h>
@@ -34,6 +32,7 @@ private:
     ifstream stream;
     int length = 0;
 
+    string root;
     string dest;
     string path_metadata;
 
@@ -52,11 +51,12 @@ private:
     bool isAvaliable(){ return stream.tellg() < length; }
 
 public:
-    FileReader(const string& path){
+    explicit FileReader(const string& path, const string &r){
         const char *_path = path.c_str();
+        root = r;
 
         string filename = UFile::getFilenameFromPath(path, true);
-        dest = UFile::getTemporaryStapDirectory(filename);
+        dest = UFile::getTemporaryStapDirectory(root, filename);
 
         stream.open(_path, ios_base::in | ios_base::binary);
 

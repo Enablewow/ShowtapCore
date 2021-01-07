@@ -18,6 +18,19 @@ bool Page::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     writer->String(K_PAGE_RESOURCE);
     background.serialize(writer);
 
+    writer->String(K_PAGE_OBJECT);
+
+    if(children.empty()) writer->Null();
+    else{
+        writer->StartArray();
+
+        for(auto &tapcon : children){
+            tapcon->serialize(writer);
+        }
+
+        writer->EndArray();
+    }
+
     writer->EndObject();
 
     return true;

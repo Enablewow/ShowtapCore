@@ -4,6 +4,8 @@
 
 #include <dto/thumbnail_info.h>
 
+using namespace showtap;
+
 bool ThumbnailInfo::deserialize(rapidjson::Value &value) {
     this->name = value[K_THUMB_NAME].GetString();
     this->data = std::stringstream(value[K_THUMB_DATA].GetString());
