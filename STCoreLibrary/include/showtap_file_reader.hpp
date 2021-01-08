@@ -11,6 +11,9 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <locale>
+#include <codecvt>
+#include <cwchar>
 
 #include <constants.hpp>
 #include <base64.h>
@@ -27,49 +30,51 @@ using namespace std;
 using namespace macaron;
 using namespace rapidjson;
 
-class FileReader {
-private:
-    ifstream stream;
-    int length = 0;
+namespace showtap {
+    class FileReader {
+        ifstream stream;
+        int length = 0;
 
-    string root;
-    string dest;
-    string path_metadata;
+        string root;
+        string dest;
+        string path_metadata;
 
-    showtap::Metadata metadata;
+        showtap::Metadata metadata;
 
-    map<string, string> renameMap;
+        map<string, string> renameMap;
 
-    void extractBinaryThumbnail();
-    void extractBinaryResources();
-    void remappingChangedFile();
+        void extractBinaryThumbnail();
+        void extractBinaryResources();
+        void remappingChangedFile();
 
-    long readSize();
-    string readString(long);
-    string readString(long, bool);
+        long readSize();
+        string readString(long);
+        string readString(long, bool);
 
-    bool isAvaliable(){ return stream.tellg() < length; }
+        bool isAvaliable(){ return stream.tellg() < length; }
 
-public:
-    explicit FileReader(const string& path, const string &r){
-        const char *_path = path.c_str();
-        root = r;
+    public:
+        explicit FileReader(const string& path, const string &r){
+            const char *_path = path.c_str();
+            root = r;
 
-        string filename = UFile::getFilenameFromPath(path, true);
-        dest = UFile::getTemporaryStapDirectory(root, filename);
+            string filename = UFile::getFilenameFromPath(path, true);
+            dest = UFile::getTemporaryStapDirectory(root, filename);
 
-        stream.open(_path, ios_base::in | ios_base::binary);
+            stream.open(_path, ios_base::in | ios_base::binary);
 
-        int f = stream.tellg();
-        stream.seekg(0, ios::end);
-        int e = stream.tellg();
+            int f = stream.tellg();
+            stream.seekg(0, ios::end);
+            int e = stream.tellg();
 
-        length = e - f;
-        stream.seekg(0, ios::beg);
-    }
-    
-    int extract();
-    string getMetadataPath() const { return path_metadata; }
-};
+            length = e - f;
+            stream.seekg(0, ios::beg);
+        }
+
+        int extract();
+        string getMetadataPath() const { return path_metadata; }
+    };
+}
+
 
 #endif /* showtap_file_reader_hpp */

@@ -16,6 +16,9 @@
 
 #include <codecvt>
 
+#include <extension/utf8proc.h>
+#include <logger.h>
+
 #define IS_ALNUM(ch) \
             ( ch >= 'a' && ch <= 'z' ) || \
             ( ch >= 'A' && ch <= 'Z' ) || \
@@ -29,6 +32,7 @@
 class UString {
     static unsigned int random_char();
 
+    static void wstrToUtf8(std::string &dest, const std::wstring &src);
 public:
     static char* decodeURL(const char* str);
     static char* encodeURL(const char* str);
@@ -61,7 +65,7 @@ public:
     static std::wstring stows(std::string const &src);
     static std::string wstos(std::wstring const &src);
 
-    static std::string base64_decode(const std::string &in);
+    static std::string normalizeNFC(std::string const &src);
 };
 
 #endif //SHOWTAP_CORE_LIBRARY_ESTRING_H

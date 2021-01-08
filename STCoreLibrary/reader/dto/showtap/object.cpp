@@ -10,6 +10,9 @@ bool Object::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const
 
     writer->StartObject();
 
+    writer->String(K_OBJECT_TYPE);
+    writer->Int(static_cast<int>(type));
+
     writer->String(K_OBJECT_POSITION_X);
     writer->Double(x);
 
@@ -121,11 +124,13 @@ void Object::setChildAttrributes(rapidjson::Value &value) {
 }
 
 void Object::traversingChangeMediaResource(Object *o, const std::string& orig, const std::string& change) {
-
     if(dynamic_cast<IMedia *>(o) != nullptr){
         auto media = dynamic_cast<IMedia *>(o);
 
-        Log::print("Compare: %s %s", UFile::getFilenameFromPath(orig).c_str(), media->getMediaName().c_str());
+        auto _name = UFile::getFilenameFromPath(orig);
+        auto _compare = media->getMediaName();
+
+        //Log::print("Compare: %s %s", _name.c_str(), _compare.c_str());
 
         if(media->getMediaName() == UFile::getFilenameFromPath(orig))
             media->setMediaFile(change);

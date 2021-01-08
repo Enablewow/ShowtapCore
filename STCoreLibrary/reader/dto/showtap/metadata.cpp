@@ -67,7 +67,7 @@ bool Metadata::deserialize(rapidjson::Value &value) {
     pointer.size = value[K_META_POINTER_SIZE].GetInt();
 
     for(auto &a : value[K_META_PAGES].GetArray()){
-        Page *_p = new Page;
+        Page *_p = new Page(a[K_PAGE_ID].GetInt64());
 
         _p->deserialize(a);
 
@@ -105,4 +105,37 @@ void Metadata::changeMediaResource(const std::string &orig, const std::string &c
             }
         }
     }
+}
+
+int64_t Metadata::addPage(int color) {
+    return addPage(color, pages.size() - 1);
+}
+
+int64_t Metadata::addPage(const std::string &file) {
+    return addPage(path, pages.size() - 1);
+}
+
+int64_t Metadata::addPage(int color, size_t index) {
+    Page *p = new Page();
+
+    if(index == pages.size() - 1)
+        pages.push_back(p);
+    else
+        pages.insert(pages.begin() + index, p);
+
+
+    return p->getPageId();
+}
+
+int64_t Metadata::addPage(const std::string &file, size_t index) {
+    Page *p = new Page();
+
+    if(index == pages.size() - 1)
+        pages.push_back(p);
+    else
+        pages.insert(pages.begin() + index, p);
+
+    p->setMediaFile(file);
+
+    return p->getPageId();
 }

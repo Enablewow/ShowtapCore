@@ -4,6 +4,7 @@
 
 #include <extension/estring.h>
 
+
 unsigned int UString::random_char() {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -216,10 +217,9 @@ bool UString::replaceAll(std::string &statement, const std::string &src, const s
 }
 
 std::wstring UString::stows(const std::string &src) {
-    using convert_typeX = std::codecvt_utf8<wchar_t>;
-    std::wstring_convert<convert_typeX, wchar_t> converterX;
+    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 
-    return converterX.from_bytes(src);
+    return converter.from_bytes(src);
 }
 
 std::string UString::wstos(const std::wstring &src) {
@@ -229,22 +229,6 @@ std::string UString::wstos(const std::wstring &src) {
     return s;
 }
 
-std::string UString::base64_decode(const std::string &in) {
-
-    std::string out;
-
-    std::vector<int> T(256,-1);
-    for (int i=0; i<64; i++) T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
-
-    int val=0, valb=-8;
-    for (unsigned char c : in) {
-        if (T[c] == -1) break;
-        val = (val<<6) + T[c];
-        valb += 6;
-        if (valb>=0) {
-            out.push_back(char((val>>valb)&0xFF));
-            valb-=8;
-        }
-    }
-    return out;
+std::string UString::normalizeNFC(const std::string &src) {
+    return (const char *)utf8proc_NFC((const uint8_t *)src.c_str());
 }

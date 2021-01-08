@@ -8,6 +8,7 @@
 #include <dto/abs_json.h>
 #include <dto/showtap/enumerates.h>
 
+#include <cstring>
 #include <extension/estring.h>
 #include <extension/efile.h>
 
@@ -22,12 +23,10 @@
 #define K_RESOURCE_RELATIVE_PATH "filePath"
 #define K_RESOURCE_TYPE_FILE "fileType"
 #define K_RESOURCE_FULL_NAME "fileFullName"
-
-// ---- Not Use ---- //
 #define K_RESOURCE_LINKED "isLinkConnect"
 #define K_RESOURCE_EXTENSION "fileExtension"
 #define K_RESOURCE_URL "resourceURL"
-// ----------------- //
+
 namespace showtap {
     class Resource : public BaseJson {
         std::string absolutePath;
@@ -45,21 +44,12 @@ namespace showtap {
         int pdfPage = -1;
 
         bool hasLink = false;
+
+        void setFileType(const char *ext);
     public:
         File getType() const { return type; }
-        void setResourceFile(std::string const &path){
-            UString::replace(absolutePath, relativePath, path);
 
-            relativePath = path;
-            url = absolutePath;
-
-            name = UFile::getFilenameFromPath(path);
-            nameWithoutExtension = UFile::getFilenameFromPath(path, true);
-
-            extension = UFile::getExtension(name);
-
-            Log::print("Changed: %s", name.c_str());
-        }
+        void setResourceFile(std::string const &path);
 
         std::string getResourceText() const { return text; }
         std::string getResourceFileName() const { return name; }

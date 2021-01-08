@@ -77,6 +77,12 @@ namespace showtap {
             return ss.str();
         }
 
+        int64_t addPage(int color, size_t index);
+        int64_t addPage(const std::string &file, size_t index);
+
+        int64_t addPage(int color);
+        int64_t addPage(const std::string &file);
+
         ~Metadata(){
             pages.clear();
         }

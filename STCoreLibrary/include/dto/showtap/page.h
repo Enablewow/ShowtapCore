@@ -13,6 +13,13 @@
 #include <dto/showtap/resource.h>
 #include <dto/showtap/object.h>
 
+#include <sys/time.h>
+#include <chrono>
+#include <cstdio>
+#include <cstring>
+#include <ctime>
+#include <iostream>
+
 #define K_PAGE_ID "pageId"
 #define K_PAGE_HIDDEN "hidden"
 #define K_PAGE_RESOURCE "resource"
@@ -36,7 +43,12 @@ namespace showtap {
 
         std::vector<Object *> children;
 
+        void issueNewId();
+
     public:
+        Page() { issueNewId(); };
+        explicit Page(int64_t _id) : id(_id) {};
+
         bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
         bool deserialize(rapidjson::Value &value) override;
 

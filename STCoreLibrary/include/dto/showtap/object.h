@@ -8,6 +8,11 @@
 #include <iostream>
 #include <vector>
 
+#include <rapidjson/reader.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stream.h>
+#include <rapidjson/encodedstream.h>
+
 #include <dto/abs_json.h>
 #include <dto/showtap/enumerates.h>
 #include <dto/showtap/resource.h>
@@ -16,6 +21,7 @@
 
 #include <dto/showtap/intf/imedia.h>
 
+#include <base64.h>
 #include <display.h>
 #include <logger.h>
 

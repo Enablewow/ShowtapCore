@@ -37,7 +37,6 @@ bool Page::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
 }
 
 bool Page::deserialize(rapidjson::Value &value) {
-    id = value[K_PAGE_ID].GetInt64();
     isHidden = value[K_PAGE_HIDDEN].GetBool();
 
     background.deserialize(value[K_PAGE_RESOURCE]);
@@ -71,4 +70,11 @@ Background Page::getBackgroundType() const {
         case File::PDF: return Background::PDF;
         default: return Background::Color;
     }
+}
+
+void Page::issueNewId() {
+    auto time = std::chrono::system_clock::now();
+    auto mill = std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch());
+
+    id = mill.count();
 }

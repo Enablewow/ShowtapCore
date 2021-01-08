@@ -7,6 +7,8 @@
 
 #include <showtap_file_reader.hpp>
 
+using namespace showtap;
+
 int FileReader::extract(){
     if(!stream.is_open() || length == 0) return ERR_EMPTY_FILE;
     if(dest.empty()) return ERR_EMPTY_DESTINATION;
@@ -14,7 +16,7 @@ int FileReader::extract(){
     extractBinaryThumbnail();
     extractBinaryResources();
 
-    //remappingChangedFile();
+    remappingChangedFile();
 
     return RESULT_OK;
 }
@@ -153,13 +155,10 @@ string FileReader::readString(long size) {
         i += bs;
     }
 
-    string decoded(UString::decodeURL(ss.str().c_str()));
-    ss.flush();
-
     //Log::print("End: %s", UString::endFrom(decoded, 30).c_str());
     //Log::print("%s ... %s", text.substr(0, 30).c_str(), UString::endFrom(text, 30).c_str());
 
-    return decoded;
+    return ss.str();
 }
 
 string FileReader::readString(long size, bool decodeBase64) {
@@ -167,12 +166,13 @@ string FileReader::readString(long size, bool decodeBase64) {
 
     if(!decodeBase64) return result;
 
-    string decode = UString::base64_decode(result);
+    string decode;
     Base64::Decode(result, decode);
 
-    Log::print("Read String: %s", decode.c_str());
+    // 한글 자모가 분리되어 저장되는 경우가 있기 때문에 (Unicode 문제) Normalize 를 돌려 글자 결합을 한다.)
+    auto normalize = UString::normalizeNFC(decode);
 
-    return decode;
+    return normalize;
 }
 
 void FileReader::remappingChangedFile() {
@@ -182,15 +182,13 @@ void FileReader::remappingChangedFile() {
         metadata.changeMediaResource(kv.first, kv.second);
     }
 
-    /*
     StringBuffer jb;
     Writer<StringBuffer> writer(jb);
 
     metadata.serialize(&writer);
     string json = jb.GetString();
 
-    ofstream cpy(dest + "/copy.info");
+    ofstream cpy(path_metadata);
     cpy << jb.GetString();
     cpy.close();
-    */
 }

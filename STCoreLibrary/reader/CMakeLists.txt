@@ -15,7 +15,11 @@ set(_DTO
 
 set(_EXTENSION
         extension/estring.cpp
-        extension/efile.cpp)
+        extension/efile.cpp
+
+        extension/utf8proc_data.c
+        extension/utf8proc.c
+)
 
 add_library(stap_reader SHARED
         ${_DTO}
