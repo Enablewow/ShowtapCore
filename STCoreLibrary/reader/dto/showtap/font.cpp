@@ -2,7 +2,7 @@
 // Created by 이종일 on 2021/01/06.
 //
 
-#include <dto/showtap/font.h>
+#include <dto/showtap/include_package.h>
 
 using namespace showtap;
 
@@ -25,10 +25,10 @@ bool Font::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     writer->Int(align);
 
     writer->String(K_FONT_COLOR);
-    writer->String(UString::intToHexCode(color).c_str());
+    writer->String(color.c_str());
 
     writer->String(K_FONT_BACKGROUND);
-    background == -1 ? writer->Null() : writer->String(UString::intToHexCode(background).c_str());
+    background.empty() ? writer->Null() : writer->String(background.c_str());
 
     writer->String(K_FONT_INFO);
     info.serialize(writer);
@@ -47,10 +47,10 @@ bool Font::deserialize(rapidjson::Value &value) {
     size = value[K_FONT_SIZE].GetInt();
     align = value[K_FONT_ALIGN].GetInt();
 
-    color = UString::hexToIntColor(value[K_FONT_COLOR].GetString());
+    color = value[K_FONT_COLOR].GetString();
 
     if(!value[K_FONT_BACKGROUND].IsNull())
-        background = UString::hexToIntColor(value[K_FONT_BACKGROUND].GetString());
+        background = value[K_FONT_BACKGROUND].GetString();
 
     info.deserialize(value[K_FONT_INFO]);
 

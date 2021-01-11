@@ -64,6 +64,20 @@ public :
 
     static bool exist(const char *path);
     static bool existDirectory(const char *path);
+
+    static const char* getRelativeDirectoryFromExtension(const char *ext);
 };
+
+inline bool isAllowedImage(const char *ext){
+    return isEqual(ext, "png") || isEqual(ext, "jpg") || isEqual(ext, "jpeg") || isEqual(ext, "bmp") || isEqual(ext, "ico");
+}
+
+inline bool isAllowedVideo(const char *ext){
+    return isEqual(ext, "mp4") || isEqual(ext, "avi") || isEqual(ext, "mov");
+}
+
+inline bool isAllowedAudio(const char *ext){
+    return isEqual(ext, "mp3") || isEqual(ext, "wav");
+}
 
 #endif //SHOWTAP_CORE_LIBRARY_EFILE_H

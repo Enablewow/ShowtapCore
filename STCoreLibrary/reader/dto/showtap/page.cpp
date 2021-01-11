@@ -2,7 +2,7 @@
 // Created by 이종일 on 2020/12/23.
 //
 
-#include <dto/showtap/page.h>
+#include <dto/showtap/include_package.h>
 
 using namespace showtap;
 
@@ -39,6 +39,7 @@ bool Page::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
 bool Page::deserialize(rapidjson::Value &value) {
     isHidden = value[K_PAGE_HIDDEN].GetBool();
 
+    background.setPageOwner(this);
     background.deserialize(value[K_PAGE_RESOURCE]);
 
     auto _objs = &value[K_PAGE_OBJECT];

@@ -2,7 +2,7 @@
 // Created by 이종일 on 2020/12/10.
 //
 
-#include <dto/showtap/object.h>
+#include <dto/showtap/include_package.h>
 
 using namespace showtap;
 
@@ -38,7 +38,7 @@ bool Object::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const
     res == nullptr ? writer->Null() : res->serialize(writer);
 
     writer->String(K_OBJECT_EFFECT);
-    effect.serialize(writer);
+    effect->serialize(writer);
 
     writer->String(K_OBJECT_FONT);
     font == nullptr ? writer->Null() : font->serialize(writer);
@@ -81,7 +81,7 @@ void Object::setCommonAttributes(rapidjson::Value &value) {
 
     alpha = value[K_OBJECT_ALPHA].GetFloat();
 
-    effect.deserialize(value[K_OBJECT_EFFECT]);
+    effect->deserialize(value[K_OBJECT_EFFECT]);
 
     if(!value[K_OBJECT_FONT].IsNull()){
         font = new Font;
@@ -92,6 +92,7 @@ void Object::setCommonAttributes(rapidjson::Value &value) {
     if(!value[K_OBJECT_RESOURCE].IsNull()){
         res = new Resource;
 
+        res->setObjectOwner(this);
         res->deserialize(value[K_OBJECT_RESOURCE]);
     }
 }

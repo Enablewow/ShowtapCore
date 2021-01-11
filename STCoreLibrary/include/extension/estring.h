@@ -32,7 +32,6 @@
 class UString {
     static unsigned int random_char();
 
-    static void wstrToUtf8(std::string &dest, const std::wstring &src);
 public:
     static char* decodeURL(const char* str);
     static char* encodeURL(const char* str);
@@ -51,8 +50,6 @@ public:
 
     static std::string endFrom(const std::string &str, int length);
 
-    static const char * boolean(bool state);
-
     static char* left_trim(char* szX);
     static char* right_trim(char* szX);
     static char* trim(char* szX);
@@ -67,5 +64,13 @@ public:
 
     static std::string normalizeNFC(std::string const &src);
 };
+
+inline const char * boolstring(bool state){
+    return state ? "true" : "false";
+}
+
+inline bool isEqual(const std::string &a1, const std::string &a2){
+    return strcmp(a1.c_str(), a2.c_str()) == 0;
+}
 
 #endif //SHOWTAP_CORE_LIBRARY_ESTRING_H

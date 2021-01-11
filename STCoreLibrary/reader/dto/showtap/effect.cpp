@@ -2,7 +2,7 @@
 // Created by 이종일 on 2021/01/06.
 //
 
-#include <dto/showtap/effect.h>
+#include <dto/showtap/include_package.h>
 
 using namespace showtap;
 
@@ -33,7 +33,7 @@ bool Effect::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const
     */
 
     writer->String(K_EFFECT_COLOR);
-    color == -1 ? writer->Null() : writer->String(UString::intToHexCode(color).c_str());
+    color.empty() ? writer->Null() : writer->String(color.c_str());
 
     writer->EndObject();
 
@@ -50,7 +50,7 @@ bool Effect::deserialize(rapidjson::Value &value) {
     volume = value[K_EFFECT_VOLUME].GetDouble();
 
     if(!value[K_EFFECT_COLOR].IsNull()){
-        color = UString::hexToIntColor(value[K_EFFECT_COLOR].GetString());
+        color = value[K_EFFECT_COLOR].GetString();
     }
 
     //style = value[K_EFFECT_STYLE].GetInt();

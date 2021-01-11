@@ -29,6 +29,8 @@
 #define RESULT_OK 0
 
 #define F_EXT_METADATA ".info"
+#define F_NAME_METADATA "resource_map.info"
+#define F_RES_ROOT_DIR "res"
 
 #endif /* constants_hpp */
 

@@ -41,20 +41,36 @@ void FileReader::extractBinaryResources() {
         // 파일 이름을 가져온다
         long nsize = readSize();
         string fpath = readString(nsize, true);
-
-        // 파일이름이 너무 길면 파일명을 자른 후 저장소에 저장 한다.
-        string origName = UFile::getFilenameFromPath(fpath);
-        string newName = UFile::shortenFilename(origName);
-        if(origName != newName){
-            renameMap[origName] = newName;
-
-            UString::replace(fpath, origName, newName);
-        }
+        string newPath;
 
         if(UString::startsWith(fpath, "./"))
             fpath = fpath.replace(0, 2, "");
 
-        string fdest = dest + "/" + fpath;
+        // Info 파일(메타데이터) 은 Stap 내에서 하나의 이름으로 통일한다.
+        if(UString::endsWith(fpath, F_EXT_METADATA)){
+            newPath = F_NAME_METADATA;
+
+        // 리소스 파일은 Stap 내에서 하나의 폴더 내에 들어가는 것으로 통일한다.
+        // 각 파일들은 확장자 별로 폴더에 들어갈 수 있으며, 길이가 긴 이름일 경우 이름을 잘라 저장한다.
+        // 이름이 변경되면 메타데이터에 상에 파일 이름도 변경될 수 있도록 한다.
+        }else if(!UString::startsWith(fpath, F_RES_ROOT_DIR)){
+            string ext = UFile::getExtension(fpath);
+
+            // 파일이름이 너무 길면 파일명을 자른 후 저장소에 저장 한다.
+            string origName = UFile::getFilenameFromPath(fpath);
+            string newName = UFile::shortenFilename(origName);
+
+            stringstream ss;
+            ss << F_RES_ROOT_DIR << "/" << UFile::getRelativeDirectoryFromExtension(ext.c_str()) << "/" << newName;
+
+            newPath = ss.str();
+
+            renameMap[origName] = newPath;
+        }else{
+            newPath = fpath;
+        }
+
+        string fdest = dest + "/" + newPath;
 
         // 파일의 폴더가 없으면 폴더를 만들어 준다.
         if(!UFile::existDirectory(fdest.c_str()))
@@ -62,7 +78,7 @@ void FileReader::extractBinaryResources() {
 
         // 파일 Binary 를 가져온다.
         long fsize = readSize();
-        //Log::print("Extract file: %s (ns: %d) size: %d", fpath.c_str(), nsize, fsize);
+        Log::print("Extract file: %s (ns: %d) size: %d", newPath.c_str(), nsize, fsize);
 
         bool _exist = UFile::exist(fdest.c_str());
 
@@ -82,7 +98,7 @@ void FileReader::extractBinaryResources() {
         if(osize > 0 && osize == fsize) { // 같은 정보의 데이터라면 저장을 스킵한다.
             stream.seekg(fsize, ios::cur);
 
-            if(UString::endsWith(fpath, F_EXT_METADATA)){
+            if(isEqual(newPath, F_NAME_METADATA)){
                 stringstream ss;
                 ss << fos.rdbuf();
 
@@ -91,7 +107,7 @@ void FileReader::extractBinaryResources() {
                 path_metadata = fdest;
             }
         }else{
-            if(UString::endsWith(fpath, F_EXT_METADATA)){
+            if(isEqual(newPath, F_NAME_METADATA)){
                 string metadatas = readString(fsize);
 
                 fos.write(metadatas.c_str(), metadatas.size());

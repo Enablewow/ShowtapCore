@@ -24,7 +24,8 @@
 #include <extension/efile.h>
 
 #include <dto/thumbnail_info.h>
-#include <dto/showtap/metadata.h>
+
+#include <dto/showtap/include_package.h>
 
 using namespace std;
 using namespace macaron;

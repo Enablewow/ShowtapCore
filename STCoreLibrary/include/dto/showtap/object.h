@@ -2,28 +2,8 @@
 // Created by 이종일 on 2020/12/10.
 //
 
-#ifndef SHOWTAP_CORE_LIBRARY_SHOWTAP_OBJECT_H
-#define SHOWTAP_CORE_LIBRARY_SHOWTAP_OBJECT_H
-
 #include <iostream>
 #include <vector>
-
-#include <rapidjson/reader.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stream.h>
-#include <rapidjson/encodedstream.h>
-
-#include <dto/abs_json.h>
-#include <dto/showtap/enumerates.h>
-#include <dto/showtap/resource.h>
-#include <dto/showtap/effect.h>
-#include <dto/showtap/font.h>
-
-#include <dto/showtap/intf/imedia.h>
-
-#include <base64.h>
-#include <display.h>
-#include <logger.h>
 
 #define K_OBJECT_POSITION_X "x"
 #define K_OBJECT_POSITION_Y "y"
@@ -39,137 +19,139 @@
 #define K_OBJECT_TYPE "showObjectType"
 
 
-namespace showtap {
+class Object : public BaseJson {
+    void traversingChangeMediaResource(Object *o, const std::string& orig, const std::string& change);
 
-    class Object : public BaseJson {
-        void traversingChangeMediaResource(Object *o, const std::string& orig, const std::string& change);
+protected:
+    Type type;
+    std::string tag = UString::UUID();
 
-    protected:
-        Type type;
-        std::string tag = UString::UUID();
+    double x = 0.0, y = 0.0;
+    double width = 0.0, height = 0.0;
 
-        double x = 0.0, y = 0.0;
-        double width = 0.0, height = 0.0;
+    bool isHidden = false;
+    bool isOn = false;
 
-        bool isHidden = false;
-        bool isOn = false;
+    float alpha = 0.0f;
 
-        float alpha = 0.0f;
+    std::vector<Object *> children;
 
-        std::vector<Object *> children;
+    Resource *res = nullptr;
+    Font *font = nullptr;
+    Effect *effect = nullptr;
 
-        Resource *res = nullptr;
-        Font *font = nullptr;
-        Effect effect;
+public:
+    explicit Object(const Type _type = Type::None) : type(_type) {
+        effect = new Effect;
+    }
 
-    public:
-        explicit Object(const Type _type = Type::None) : type(_type) {}
+    void setCommonAttributes(rapidjson::Value &value);
+    void setChildAttrributes(rapidjson::Value &value);
+    void changeMediaResource(const std::string &orig, const std::string &change);
 
-        void setCommonAttributes(rapidjson::Value &value);
-        void setChildAttrributes(rapidjson::Value &value);
-        void changeMediaResource(const std::string &orig, const std::string &change);
+    bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
+    bool deserialize(rapidjson::Value &value) override;
 
-        bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
-        bool deserialize(rapidjson::Value &value) override;
+    std::string getTag() const { return tag; }
 
-        std::string getTag() const { return tag; }
+    std::string toString() const {
+        std::stringstream ss;
 
-        std::string toString() const {
-            std::stringstream ss;
+        ss << "Class: " << getClassName() << "\n";
+        ss << "Tag: " << tag << "\n";
+        ss << "Children: " << children.size() << " Child\n";
+        ss << "(";
 
-            ss << "Class: " << getClassName() << "\n";
-            ss << "Tag: " << tag << "\n";
-            ss << "Children: " << children.size() << " Child\n";
-            ss << "(";
+        for(auto iter = children.begin(); iter < children.end(); iter++){
+            ss << (*iter)->getClassName();
 
-            for(auto iter = children.begin(); iter < children.end(); iter++){
-                ss << (*iter)->getClassName();
-
-                if(children.end() - 1 != iter) ss << ", ";
-            }
-
-            ss << ")";
-
-            return ss.str();
+            if(children.end() - 1 != iter) ss << ", ";
         }
 
-        virtual std::string getClassName() const { return "Object"; }
+        ss << ")";
 
-        ~Object(){ children.clear(); }
-    };
+        return ss.str();
+    }
 
-    class Tapcon : public Object {
-    public:
-        Tapcon() : Object(Type::Tapcon) {}
+    virtual std::string getClassName() const { return "Object"; }
 
-        std::string getClassName() const override { return "Tapcon"; }
-    };
+    ~Object(){
+        children.clear();
 
-    class Group : public Object {
-    public:
-        Group() : Object(Type::Group){}
+        res = nullptr;
+        font = nullptr;
+        effect = nullptr;
+    }
+};
 
-        std::string getClassName() const override { return "Group"; }
-    };
+class Tapcon : public Object {
+public:
+    Tapcon() : Object(Type::Tapcon) {}
 
-    class Image : public Object, public IMedia {
-    public:
-        Image() : Object(Type::Image){}
+    std::string getClassName() const override { return "Tapcon"; }
+};
 
-        std::string getClassName() const override { return "Image"; }
+class Group : public Object {
+public:
+    Group() : Object(Type::Group){}
 
-        void setMediaFile(std::string path) override { res->setResourceFile(path); }
-        std::string getMediaName() const override { return res->getResourceFileName(); }
-    };
+    std::string getClassName() const override { return "Group"; }
+};
 
-    class Video : public Object, public IMedia {
-    public:
-        Video() : Object(Type::Video){}
+class Image : public Object, public IMedia {
+public:
+    Image() : Object(Type::Image){}
 
-        std::string getClassName() const override { return "Video"; }
+    std::string getClassName() const override { return "Image"; }
 
-        void setMediaFile(std::string path) override { res->setResourceFile(path); }
-        std::string getMediaName() const override { return res->getResourceFileName(); }
-    };
+    void setMediaFile(std::string path) override { res->setResourceFile(path); }
+    std::string getMediaName() const override { return res->getResourceFileName(); }
+};
 
-    class Audio : public Object, public IMedia {
-    public:
-        Audio() : Object(Type::Audio){}
+class Video : public Object, public IMedia {
+public:
+    Video() : Object(Type::Video){}
 
-        std::string getClassName() const override { return "Audio"; }
+    std::string getClassName() const override { return "Video"; }
 
-        void setMediaFile(std::string path) override { res->setResourceFile(path); }
-        std::string getMediaName() const override { return res->getResourceFileName(); }
-    };
+    void setMediaFile(std::string path) override { res->setResourceFile(path); }
+    std::string getMediaName() const override { return res->getResourceFileName(); }
+};
 
-    class Mark : public Object {
-    public:
-        Mark() : Object(Type::Mark){}
+class Audio : public Object, public IMedia {
+public:
+    Audio() : Object(Type::Audio){}
 
-        std::string getClassName() const override { return "Mark"; }
-    };
+    std::string getClassName() const override { return "Audio"; }
 
-    class URL : public Object {
-    public:
-        URL() : Object(Type::URL){}
+    void setMediaFile(std::string path) override { res->setResourceFile(path); }
+    std::string getMediaName() const override { return res->getResourceFileName(); }
+};
 
-        std::string getClassName() const override { return "URL"; }
-    };
+class Mark : public Object {
+public:
+    Mark() : Object(Type::Mark){}
 
-    class Text : public Object {
-    public:
-        Text() : Object(Type::Text){}
+    std::string getClassName() const override { return "Mark"; }
+};
 
-        std::string getClassName() const override { return "Text"; }
-    };
+class URL : public Object {
+public:
+    URL() : Object(Type::URL){}
 
-    class Slide : public Object {
-    public:
-        Slide() : Object(Type::Slide){}
+    std::string getClassName() const override { return "URL"; }
+};
 
-        std::string getClassName() const override { return "Slide"; }
-    };
-}
+class Text : public Object {
+public:
+    Text() : Object(Type::Text){}
 
+    std::string getClassName() const override { return "Text"; }
+};
 
-#endif //SHOWTAP_CORE_LIBRARY_SHOWTAP_OBJECT_H
+class Slide : public Object {
+public:
+    Slide() : Object(Type::Slide){}
+
+    std::string getClassName() const override { return "Slide"; }
+};

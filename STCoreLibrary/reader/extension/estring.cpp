@@ -144,10 +144,6 @@ std::string UString::endFrom(const std::string &str, int length) {
     return str.substr(str.length() - length, length);
 }
 
-const char *UString::boolean(bool state) {
-    return state ? "true" : "false";
-}
-
 char *UString::left_trim(char *szX) {
     if(' '==szX[0]) while(' '==(++szX)[0]);
     return szX;

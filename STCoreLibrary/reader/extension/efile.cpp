@@ -85,3 +85,17 @@ bool UFile::existDirectory(const char *path){
         default: return true;
     }
 }
+
+const char *UFile::getRelativeDirectoryFromExtension(const char* ext) {
+    if(isAllowedImage(ext)){
+        return "image";
+    }else if(isAllowedVideo(ext)){
+        return "video";
+    }else if(isAllowedAudio(ext)){
+        return "audio";
+    }else if(isEqual(ext, "pdf")){
+        return "pdf";
+    }
+
+    return "etc";
+}

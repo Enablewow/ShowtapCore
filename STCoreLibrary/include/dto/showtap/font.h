@@ -1,14 +1,6 @@
 //
 // Created by 이종일 on 2021/01/06.
 //
-
-#ifndef SHOWTAP_LIBRARY_FONT_H
-#define SHOWTAP_LIBRARY_FONT_H
-
-#include <dto/abs_json.h>
-
-#include <extension/estring.h>
-
 #define K_FONT_STYLE_BOLD "isBold"
 #define K_FONT_STYLE_ITALIC "isItalic"
 #define K_FONT_STYLE_UNDERLINE "isUnderLine"
@@ -22,38 +14,31 @@
 #define K_FONT_FAMILY_NAME "fontFamilyName"
 #define K_FONT_NAME "fontName"
 
-namespace showtap {
+class FontInfo : public BaseJson {
+    std::string familyName;
+    std::string fontName;
 
-    class FontInfo : public BaseJson {
-        std::string familyName;
-        std::string fontName;
+    std::vector<std::string> familyNames;
 
-        std::vector<std::string> familyNames;
+public:
+    bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
+    bool deserialize(rapidjson::Value &value) override;
+};
 
-    public:
-        bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
-        bool deserialize(rapidjson::Value &value) override;
-    };
+class Font : public BaseJson {
+    bool bold = false;
+    bool italic = false;
+    bool underline = false;
 
-    class Font : public BaseJson {
-        bool bold = false;
-        bool italic = false;
-        bool underline = false;
+    int size = 0;
+    int align = 0;
 
-        int size = 0;
-        int align = 0;
+    std::string color;
+    std::string background;
 
-        int color = 0x000000;
-        int background = -1;
+    FontInfo info;
 
-        FontInfo info;
-
-    public:
-        bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
-        bool deserialize(rapidjson::Value &value) override;
-    };
-
-
-}
-
-#endif //SHOWTAP_LIBRARY_FONT_H
+public:
+    bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
+    bool deserialize(rapidjson::Value &value) override;
+};
