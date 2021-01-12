@@ -65,7 +65,6 @@ bool Resource::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) con
 }
 
 bool Resource::deserialize(rapidjson::Value &value) {
-    absolutePath = UString::normalizeNFC(UString::decodeURL(value[K_RESOURCE_ABSOLUTE_PATH].GetString()));
     relativePath = UString::normalizeNFC(UString::decodeURL(value[K_RESOURCE_RELATIVE_PATH].GetString()));
 
     size = value[K_RESOURCE_SIZE].GetString();
@@ -150,7 +149,6 @@ void Resource::setFileType(const char *ext) {
 }
 
 void Resource::setResourceFile(const std::string &path) {
-    UString::replace(absolutePath, relativePath, path);
     relativePath = path;
 
     name = UFile::getFilenameFromPath(path);

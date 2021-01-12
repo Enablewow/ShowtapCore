@@ -4,7 +4,6 @@
 
 #include <cstring>
 
-#define K_RESOURCE_ABSOLUTE_PATH "fileUrlPath"
 #define K_RESOURCE_SIZE "fileSize"
 #define K_RESOURCE_NAME "fileName"
 #define K_RESOURCE_TYPE_CLOUD "cloudType"
@@ -30,7 +29,6 @@ class Resource : public BaseJson {
 
     Owner owner = Owner::None;
 
-    std::string absolutePath;
     std::string relativePath;
     std::string size;
     std::string name;

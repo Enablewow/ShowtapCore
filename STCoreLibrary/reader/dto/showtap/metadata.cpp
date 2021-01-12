@@ -18,9 +18,6 @@ bool Metadata::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) con
     writer->String(K_META_RATIO);
     writer->Double(ratio);
 
-    writer->String(K_META_PATH);
-    writer->String(path.c_str());
-
     writer->String(K_META_FILENAME);
     writer->String(name.c_str());
 
@@ -58,7 +55,7 @@ bool Metadata::deserialize(rapidjson::Value &value) {
     os = value[K_META_OS].GetString()[0];
 
     ratio = value[K_META_RATIO].GetDouble();
-    path = value[K_META_PATH].GetString();
+
     name = value[K_META_FILENAME].GetString();
 
     saved = value[K_META_SAVED].GetBool();

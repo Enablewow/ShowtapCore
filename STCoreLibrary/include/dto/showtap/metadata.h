@@ -7,7 +7,6 @@
 #define K_META_OS "os"
 #define K_META_VERSION "version"
 #define K_META_RATIO "ratio"
-#define K_META_PATH "_localDataPath"
 #define K_META_FILENAME "fileName"
 #define K_META_SAVED "isSave"
 #define K_META_CURRENT_INDEX "currentIndex"
@@ -29,7 +28,6 @@ char os = 'D';
     double ratio = 0.0;
     int version = 0;
 
-    std::string path;
     bool saved = false;
 
     int currentIndex = 0;
@@ -59,7 +57,6 @@ public:
         std::stringstream ss;
         ss << "------ Metadata Info ------\n";
         ss << "File: " << name << "\n";
-        ss << "Path: " << path << "\n";
         ss << "Page: " << pages.size() << " Pages\n";
         ss << "-------------\n";
 

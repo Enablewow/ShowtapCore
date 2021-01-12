@@ -195,6 +195,7 @@ void FileReader::remappingChangedFile() {
     if (renameMap.empty()) return;
 
     for(auto &kv : renameMap){
+        Log::print("%s -> %s", kv.first.c_str(), kv.second.c_str());
         metadata.changeMediaResource(kv.first, kv.second);
     }
 
