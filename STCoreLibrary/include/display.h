@@ -6,7 +6,6 @@
 #define SHOWTAP_LIBRARY_DISPLAY_H
 
 #include <iostream>
-#include <logger.h>
 
 namespace showtap {
     struct RECT {

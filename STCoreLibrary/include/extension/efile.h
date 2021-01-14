@@ -13,7 +13,6 @@
 #include <regex>
 
 #include <extension/estring.h>
-#include <logger.h>
 
 #ifndef REGEX_EXTENSION
     #define REGEX_EXTENSION std::regex("\\.([a-zA-Z0-4]+)$")

@@ -17,7 +17,6 @@
 #include <codecvt>
 
 #include <extension/utf8proc.h>
-#include <logger.h>
 
 #define IS_ALNUM(ch) \
             ( ch >= 'a' && ch <= 'z' ) || \

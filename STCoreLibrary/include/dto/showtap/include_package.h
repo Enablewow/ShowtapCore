@@ -13,8 +13,6 @@
 #include <base64.h>
 #include <display.h>
 
-#include <logger.h>
-
 #include <rapidjson/reader.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stream.h>

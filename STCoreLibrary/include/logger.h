@@ -18,21 +18,21 @@ public :
 
         vsprintf(buf, format, args);
 
-#ifdef PLATFORM
-        #if PLATFORM == ANDROID
-                    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, buf, nullptr);
-                #endif
-#endif
+        #ifdef PLATFORM_ANDROID
+            __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, buf, nullptr);
+        #else
+            std::cout << "[" << LOG_TAG << "] " << buf << std::endl;
+        #endif
 
         va_end(args);
     }
 
-    static void print(std::string text){
-#ifdef PLATFORM
-        #if PLATFORM == ANDROID
+    static void print(const std::string &text){
+        #if defined(PLATFORM_ANDROID)
             __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, text.c_str(), nullptr);
+        #else
+            std::cout << "[" << LOG_TAG << "] " << text << std::endl;
         #endif
-#endif
     }
 };
 

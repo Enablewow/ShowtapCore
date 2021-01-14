@@ -18,13 +18,14 @@
 class Metadata : public BaseJson {
     std::string name;
 
-#if PLATFORM == ANDROID
-    char os = 'A';
-#elif PLATFORM == IOS
-    char os = 'I';
-#else
-char os = 'D';
-#endif
+    #if defined(PLATFORM_ANDROID)
+        char os = 'A';
+    #elif defined(PLATFORM_IOS)
+        char os = 'I';
+    #else
+        char os = 'D';
+    #endif
+
     double ratio = 0.0;
     int version = 0;
 
