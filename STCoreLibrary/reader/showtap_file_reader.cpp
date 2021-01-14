@@ -142,13 +142,15 @@ long FileReader::readSize() {
     auto *buf = new char[sizeof(long)];
     stream.read(buf, sizeof buf);
 
-    long size =
-            (buf[3] << 24) |
-            (buf[2] << 16) |
-            (buf[1] << 8) |
-            (buf[0]);
+    Log::print("Buffer Text: %s", buf);
 
-    //Log::print("Buffer Size: %d Word: %s real size: %ld", sizeof buf, &buf, size);
+    long size =
+            (unsigned char)(buf[3]) << 24 |
+            (unsigned char)(buf[2]) << 16 |
+            (unsigned char)(buf[1]) << 8 |
+            (unsigned char)(buf[0]);
+
+    Log::print("Buffer Size: %d real size: %ld", sizeof buf, size);
 
     delete[] buf;
 

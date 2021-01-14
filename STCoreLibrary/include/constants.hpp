@@ -11,7 +11,6 @@
 #include <iostream>
 
 #include <errors.hpp>
-#include <globals.h>
 
 #define ARGS_HELP "help"
 

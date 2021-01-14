@@ -59,6 +59,8 @@ namespace showtap {
             const char *_path = path.c_str();
             root = r;
 
+            Log::print("File: %s", path.c_str());
+
             string filename = UFile::getFilenameFromPath(path, true);
             dest = UFile::getTemporaryStapDirectory(root, filename);
 
@@ -69,6 +71,9 @@ namespace showtap {
             int e = stream.tellg();
 
             length = e - f;
+
+            Log::print("Size: %d", length);
+
             stream.seekg(0, ios::beg);
         }
 
