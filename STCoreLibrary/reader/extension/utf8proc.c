@@ -41,7 +41,7 @@
  */
 
 
-#include "../../include/extension/utf8proc.h"
+#include <extension/utf8proc.h>
 
 #ifndef SSIZE_MAX
 #define SSIZE_MAX ((size_t)SIZE_MAX/2)
