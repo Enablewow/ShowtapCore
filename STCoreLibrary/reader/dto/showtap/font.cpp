@@ -31,7 +31,8 @@ bool Font::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     background.empty() ? writer->Null() : writer->String(background.c_str());
 
     writer->String(K_FONT_INFO);
-    info.serialize(writer);
+    info->serialize(writer);
+    delete info;
 
     writer->EndObject();
 
@@ -52,7 +53,8 @@ bool Font::deserialize(rapidjson::Value &value) {
     if(!value[K_FONT_BACKGROUND].IsNull())
         background = value[K_FONT_BACKGROUND].GetString();
 
-    info.deserialize(value[K_FONT_INFO]);
+    info = new FontInfo();
+    info->deserialize(value[K_FONT_INFO]);
 
     return true;
 }

@@ -36,12 +36,15 @@ bool Object::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const
 
     writer->String(K_OBJECT_RESOURCE);
     res == nullptr ? writer->Null() : res->serialize(writer);
+    delete res;
 
     writer->String(K_OBJECT_EFFECT);
     effect->serialize(writer);
+    delete effect;
 
     writer->String(K_OBJECT_FONT);
     font == nullptr ? writer->Null() : font->serialize(writer);
+    delete font;
 
     writer->String(K_OBJECT_CHILDREN);
     if(children.empty()) writer->Null();

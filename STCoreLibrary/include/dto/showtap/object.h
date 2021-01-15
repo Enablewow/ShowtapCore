@@ -76,6 +76,10 @@ public:
     virtual std::string getClassName() const { return "Object"; }
 
     ~Object(){
+        for(auto& a : children){
+            delete a;
+        }
+
         children.clear();
 
         res = nullptr;

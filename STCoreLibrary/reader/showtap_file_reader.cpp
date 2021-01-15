@@ -102,7 +102,8 @@ void FileReader::extractBinaryResources() {
                 stringstream ss;
                 ss << fos.rdbuf();
 
-                metadata.import(ss.str());
+                metadata = new Metadata();
+                metadata->import(ss.str());
 
                 path_metadata = fdest;
             }
@@ -111,7 +112,9 @@ void FileReader::extractBinaryResources() {
                 string metadatas = readString(fsize);
 
                 fos.write(metadatas.c_str(), metadatas.size());
-                metadata.import(metadatas);
+
+                metadata = new Metadata();
+                metadata->import(metadatas);
 
                 path_metadata = fdest;
             }else{
@@ -198,13 +201,13 @@ void FileReader::remappingChangedFile() {
 
     for(auto &kv : renameMap){
         Log::print("%s -> %s", kv.first.c_str(), kv.second.c_str());
-        metadata.changeMediaResource(kv.first, kv.second);
+        metadata->changeMediaResource(kv.first, kv.second);
     }
 
     StringBuffer jb;
     Writer<StringBuffer> writer(jb);
 
-    metadata.serialize(&writer);
+    metadata->serialize(&writer);
     string json = jb.GetString();
 
     ofstream cpy(path_metadata);

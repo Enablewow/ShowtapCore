@@ -65,6 +65,10 @@ public:
     }
 
     ~Metadata(){
+        for (auto &p : pages){
+            delete p;
+        }
+
         pages.clear();
     }
 };

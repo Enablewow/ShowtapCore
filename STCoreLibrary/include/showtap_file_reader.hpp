@@ -40,7 +40,7 @@ namespace showtap {
         string dest;
         string path_metadata;
 
-        showtap::Metadata metadata;
+        showtap::Metadata *metadata;
 
         map<string, string> renameMap;
 
@@ -79,6 +79,17 @@ namespace showtap {
 
         int extract();
         string getMetadataPath() const { return path_metadata; }
+
+        ~FileReader(){
+            delete metadata;
+            metadata = nullptr;
+
+            renameMap.clear();
+
+            if(stream.is_open()){
+                stream.close();
+            }
+        }
     };
 }
 

@@ -16,7 +16,8 @@ bool Page::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
     writer->Bool(isHidden);
 
     writer->String(K_PAGE_RESOURCE);
-    background.serialize(writer);
+    background->serialize(writer);
+    delete background;
 
     writer->String(K_PAGE_OBJECT);
 
@@ -26,6 +27,7 @@ bool Page::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
 
         for(auto &tapcon : children){
             tapcon->serialize(writer);
+            delete tapcon;
         }
 
         writer->EndArray();
@@ -39,8 +41,10 @@ bool Page::serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const {
 bool Page::deserialize(rapidjson::Value &value) {
     isHidden = value[K_PAGE_HIDDEN].GetBool();
 
-    background.setPageOwner(this);
-    background.deserialize(value[K_PAGE_RESOURCE]);
+    background = new Resource;
+
+    background->setPageOwner(this);
+    background->deserialize(value[K_PAGE_RESOURCE]);
 
     auto _objs = &value[K_PAGE_OBJECT];
     if(_objs->IsNull()) return true;
@@ -66,7 +70,7 @@ bool Page::deserialize(rapidjson::Value &value) {
 }
 
 Background Page::getBackgroundType() const {
-    switch(background.getType()){
+    switch(background->getType()){
         case File::Image: return Background::Image;
         case File::PDF: return Background::PDF;
         default: return Background::Color;

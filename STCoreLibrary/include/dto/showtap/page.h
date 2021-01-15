@@ -28,7 +28,7 @@ class Page : public BaseJson, IMedia {
     int64_t id = -1;
 
     bool isHidden = false;
-    Resource background;
+    Resource *background;
 
     std::vector<Object *> children;
 
@@ -71,10 +71,10 @@ public:
     void setMediaFile(std::string path) override {
         if(getBackgroundType() == Background::Color) return;
 
-        background.setResourceFile(path);
+        background->setResourceFile(path);
     }
 
     std::string getMediaName() const override {
-        return getBackgroundType() == Background::Color ? background.getResourceText() :background.getResourceFileName();
+        return getBackgroundType() == Background::Color ? background->getResourceText() :background->getResourceFileName();
     }
 };

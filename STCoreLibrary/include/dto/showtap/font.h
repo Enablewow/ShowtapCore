@@ -36,7 +36,7 @@ class Font : public BaseJson {
     std::string color;
     std::string background;
 
-    FontInfo info;
+    FontInfo *info;
 
 public:
     bool serialize(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
